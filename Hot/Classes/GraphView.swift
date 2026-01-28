@@ -26,6 +26,11 @@ import Cocoa
 
 public class GraphView: NSView
 {
+    @IBInspectable public dynamic var showSpeed:       Bool   = true
+    @IBInspectable public dynamic var showTemperature: Bool   = true
+    @IBInspectable public dynamic var speedLabel:      String = "Speed"
+    @IBInspectable public dynamic var tempLabel:       String = "Temperature"
+
     public dynamic var data = [ ( speed: Int, temperature: Int ) ]()
     {
         didSet
@@ -133,29 +138,37 @@ public class GraphView: NSView
         path1.lineCapStyle = .round
         path2.lineCapStyle = .round
 
-        #if !arch( arm64 )
+        if self.showSpeed
+        {
             NSColor.systemBlue.withAlphaComponent( 0.75 ).setStroke()
             path1.stroke()
-        #endif
+        }
 
-        NSColor.systemOrange.withAlphaComponent( 0.75 ).setStroke()
-        path2.stroke()
+        if self.showTemperature
+        {
+            NSColor.systemOrange.withAlphaComponent( 0.75 ).setStroke()
+            path2.stroke()
+        }
 
         if UserDefaults.standard.bool( forKey: "DrawGraphGradient" )
         {
-            let fill1 = path1.copy() as! NSBezierPath
-            let fill2 = path2.copy() as! NSBezierPath
-
-            fill1.line( to: NSMakePoint( end1.x, lowest1 - 20 ) )
-            fill2.line( to: NSMakePoint( end2.x, lowest2 - 20 ) )
-            fill1.line( to: NSMakePoint( rect.origin.x, lowest1 - 20 ) )
-            fill2.line( to: NSMakePoint( rect.origin.x, lowest2 - 20 ) )
-
-            fill1.close()
-            fill2.close()
-
-            NSGradient( colors: [ NSColor.systemBlue.withAlphaComponent( 0.75 ),   NSColor.clear ] )?.draw( in: fill1, angle: -90 )
-            NSGradient( colors: [ NSColor.systemOrange.withAlphaComponent( 0.75 ), NSColor.clear ] )?.draw( in: fill2, angle: -90 )
+            if self.showSpeed
+            {
+                let fill1 = path1.copy() as! NSBezierPath
+                fill1.line( to: NSMakePoint( end1.x, lowest1 - 20 ) )
+                fill1.line( to: NSMakePoint( rect.origin.x, lowest1 - 20 ) )
+                fill1.close()
+                NSGradient( colors: [ NSColor.systemBlue.withAlphaComponent( 0.75 ),   NSColor.clear ] )?.draw( in: fill1, angle: -90 )
+            }
+            
+            if self.showTemperature
+            {
+                let fill2 = path2.copy() as! NSBezierPath
+                fill2.line( to: NSMakePoint( end2.x, lowest2 - 20 ) )
+                fill2.line( to: NSMakePoint( rect.origin.x, lowest2 - 20 ) )
+                fill2.close()
+                NSGradient( colors: [ NSColor.systemOrange.withAlphaComponent( 0.75 ), NSColor.clear ] )?.draw( in: fill2, angle: -90 )
+            }
         }
 
         let attributes: [ NSAttributedString.Key: Any ] =
@@ -164,14 +177,21 @@ public class GraphView: NSView
                 .font: NSFont.systemFont( ofSize: 8 ),
             ]
 
-        NSColor.systemOrange.withAlphaComponent( 0.75 ).setFill()
-        NSBezierPath( ovalIn: NSMakeRect( rect.origin.x, rect.origin.y, 7.5, 7.5 ) ).fill()
-        ( "Temperature" as NSString ).draw( at: NSMakePoint( rect.origin.x + 10, rect.origin.y - 1 ), withAttributes: attributes )
+        if self.showTemperature
+        {
+            NSColor.systemOrange.withAlphaComponent( 0.75 ).setFill()
+            NSBezierPath( ovalIn: NSMakeRect( rect.origin.x, rect.origin.y, 7.5, 7.5 ) ).fill()
+            ( self.tempLabel as NSString ).draw( at: NSMakePoint( rect.origin.x + 10, rect.origin.y - 1 ), withAttributes: attributes )
+        }
 
-        #if !arch( arm64 )
+        if self.showSpeed
+        {
+            var yOffset: CGFloat = 10
+            if !self.showTemperature { yOffset = 0 }
+            
             NSColor.systemBlue.withAlphaComponent( 0.75 ).setFill()
-            NSBezierPath( ovalIn: NSMakeRect( rect.origin.x, rect.origin.y + 10, 7.5, 7.5 ) ).fill()
-            ( "Speed" as NSString ).draw( at: NSMakePoint( rect.origin.x + 10, rect.origin.y + 9 ), withAttributes: attributes )
-        #endif
+            NSBezierPath( ovalIn: NSMakeRect( rect.origin.x, rect.origin.y + yOffset, 7.5, 7.5 ) ).fill()
+            ( self.speedLabel as NSString ).draw( at: NSMakePoint( rect.origin.x + 10, rect.origin.y + yOffset - 1 ), withAttributes: attributes )
+        }
     }
 }

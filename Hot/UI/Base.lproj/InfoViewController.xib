@@ -8,18 +8,19 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="InfoViewController" customModule="Hot" customModuleProvider="target">
             <connections>
+                <outlet property="fanGraphView" destination="Fan-Graph" id="Fan-Gr-Conn"/>
                 <outlet property="graphView" destination="fKC-eM-8Gr" id="GqG-t8-Mqb"/>
-                <outlet property="graphViewHeight" destination="Xru-bU-lDl" id="Trb-lr-WNa"/>
+                <outlet property="graphViewHeight" destination="GStack-Height" id="Trb-lr-WNa"/>
                 <outlet property="view" destination="c22-O7-iKe" id="cLu-Fu-Lbr"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="c22-O7-iKe">
-            <rect key="frame" x="0.0" y="0.0" width="217" height="249"/>
+            <rect key="frame" x="0.0" y="0.0" width="350" height="249"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9GX-0h-uwG">
-                    <rect key="frame" x="20" y="0.0" width="177" height="244"/>
+                    <rect key="frame" x="20" y="0.0" width="310" height="244"/>
                     <subviews>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="8Gt-35-5Ho">
                             <rect key="frame" x="0.0" y="228" width="177" height="16"/>
@@ -286,6 +287,17 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mtd-5C-kjs">
+                                    <rect key="frame" x="58" y="-7" width="120" height="25"/>
+                                    <buttonCell key="cell" type="check" title="Manual Control" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Mod-Cell">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="changeFanMode:" target="-2" id="Act-Mode"/>
+                                    </connections>
+                                </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F01-KG-WAt">
                                     <rect key="frame" x="142" y="0.0" width="37" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="YN4-so-Lw0">
@@ -303,22 +315,46 @@
                                 </textField>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="centerY" secondItem="xOG-gg-jQ1" secondAttribute="centerY" id="19f-fQ-a4c"/>
+                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="centerY" secondItem="9xm-le-geD" secondAttribute="centerY" id="Label-Center-Container"/>
+                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="top" secondItem="9xm-le-geD" secondAttribute="top" id="Btn-Top"/>
+                                <constraint firstAttribute="bottom" secondItem="Mtd-5C-kjs" secondAttribute="bottom" id="Btn-Bottom"/>
                                 <constraint firstAttribute="trailing" secondItem="F01-KG-WAt" secondAttribute="trailing" id="I76-wh-p6x"/>
                                 <constraint firstItem="G1N-Jm-VAf" firstAttribute="leading" secondItem="xOG-gg-jQ1" secondAttribute="trailing" constant="8" symbolic="YES" id="OeB-fM-N3o"/>
-                                <constraint firstItem="F01-KG-WAt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="G1N-Jm-VAf" secondAttribute="trailing" constant="8" symbolic="YES" id="XZ5-eZ-ytO"/>
-                                <constraint firstItem="xOG-gg-jQ1" firstAttribute="top" secondItem="9xm-le-geD" secondAttribute="top" id="dSD-s6-5hK"/>
+                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="leading" secondItem="G1N-Jm-VAf" secondAttribute="trailing" constant="8" symbolic="YES" id="Dropdown-Lead"/>
+                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="centerY" secondItem="G1N-Jm-VAf" secondAttribute="centerY" id="Dropdown-Center"/>
+                                <constraint firstItem="F01-KG-WAt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Mtd-5C-kjs" secondAttribute="trailing" constant="8" symbolic="YES" id="XZ5-eZ-ytO"/>
                                 <constraint firstItem="F01-KG-WAt" firstAttribute="centerY" secondItem="G1N-Jm-VAf" secondAttribute="centerY" id="rwZ-0D-WNj"/>
-                                <constraint firstAttribute="bottom" secondItem="xOG-gg-jQ1" secondAttribute="bottom" id="vA4-Z5-hwM"/>
                                 <constraint firstItem="xOG-gg-jQ1" firstAttribute="leading" secondItem="9xm-le-geD" secondAttribute="leading" id="vF2-il-Hsl"/>
+                                <constraint firstItem="xOG-gg-jQ1" firstAttribute="centerY" secondItem="9xm-le-geD" secondAttribute="centerY" id="Image-Center-Y"/>
                             </constraints>
                         </customView>
-                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="fKC-eM-8Gr" customClass="GraphView" customModule="Hot" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="177" height="100"/>
+                        <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Graph-Stack">
+                            <rect key="frame" x="0.0" y="0.0" width="310" height="100"/>
+                            <subviews>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="fKC-eM-8Gr" customClass="GraphView" customModule="Hot" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="150" height="100"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="showSpeed" value="NO"/>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="showTemperature" value="YES"/>
+                                    </userDefinedRuntimeAttributes>
+                                </customView>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Fan-Graph" customClass="GraphView" customModule="Hot" customModuleProvider="target">
+                                    <rect key="frame" x="160" y="0.0" width="150" height="100"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="showSpeed" value="YES"/>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="showTemperature" value="NO"/>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="speedLabel" value="Fan Scaling"/>
+                                    </userDefinedRuntimeAttributes>
+                                </customView>
+                            </subviews>
                             <constraints>
-                                <constraint firstAttribute="height" constant="100" id="Xru-bU-lDl"/>
+                                <constraint firstAttribute="height" constant="100" id="GStack-Height"/>
                             </constraints>
-                        </customView>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                        </stackView>
                     </subviews>
                     <constraints>
                         <constraint firstItem="8Gt-35-5Ho" firstAttribute="width" secondItem="0nY-ns-CoD" secondAttribute="width" id="Z2K-sQ-WfV"/>

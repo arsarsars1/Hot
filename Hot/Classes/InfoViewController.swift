@@ -23,6 +23,7 @@
  ******************************************************************************/
 
 import Cocoa
+import SMCKit
 
 public class InfoViewController: NSViewController
 {
@@ -47,7 +48,10 @@ public class InfoViewController: NSViewController
     #endif
 
     @IBOutlet public private( set ) var graphView:       GraphView?
+    @IBOutlet public private( set ) var fanGraphView:    GraphView?
     @IBOutlet private               var graphViewHeight: NSLayoutConstraint!
+    
+    private var maxFanSpeed: Int = 6000
 
     deinit
     {
@@ -59,11 +63,51 @@ public class InfoViewController: NSViewController
         "InfoViewController"
     }
 
+    @IBOutlet private var fanModeDropdown: NSButton!
+
+    @IBAction private func changeFanMode( _ sender: NSButton )
+    {
+        let isManual = sender.state == .on
+        let key      = "F0Md" // Assumes Fan 0 for the main info view
+        
+        // Debug print
+        print( "HOT_DEBUG: InfoView changeFanMode - Key: \(key), Manual: \(isManual)" )
+        
+        // Similar to FanViewController logic
+        var byteVal = UInt8( isManual ? 1 : 0 )
+        let data    = Data( bytes: &byteVal, count: 1 )
+        
+        guard let keyCode = key.cString( using: .ascii )
+        else
+        {
+            return
+        }
+        
+        var k: UInt32 = 0
+        if keyCode.count == 5
+        {
+            k = UInt32( keyCode[ 0 ] ) << 24
+              | UInt32( keyCode[ 1 ] ) << 16
+              | UInt32( keyCode[ 2 ] ) <<  8
+              | UInt32( keyCode[ 3 ] ) <<  0
+        }
+        
+        let result = SMCKit.SMC.shared.writeKey( k, data: data )
+        print( "HOT_DEBUG: InfoView writeSMC - Result: \(result)" )
+    }
+
+
     public override func viewDidLoad()
     {
         super.viewDidLoad()
 
         self.graphViewHeight.constant = 0
+
+        // Force width to ensure menu item expands and fits the new dropdown
+        var frame = self.view.frame
+        frame.size.width = 450
+        self.view.frame = frame
+        print( "HOT_DEBUG: InfoView viewDidLoad - Frame width set to: \(self.view.frame.width)" )
 
         self.setTimer()
         self.log.refresh
@@ -75,6 +119,39 @@ public class InfoViewController: NSViewController
         }
 
         UserDefaults.standard.addObserver( self, forKeyPath: "refreshInterval",  options: [], context: nil )
+        
+        self.detectMaxFanSpeed()
+    }
+    
+    private func detectMaxFanSpeed()
+    {
+        // helper to make 4-char code
+        func key( _ s: String ) -> UInt32
+        {
+            guard let c = s.cString( using: .ascii ), c.count == 5 else { return 0 }
+            return UInt32( c[ 0 ] ) << 24 | UInt32( c[ 1 ] ) << 16 | UInt32( c[ 2 ] ) << 8 | UInt32( c[ 3 ] )
+        }
+
+        var maxSpeed = 0.0
+        
+        // Check F0Mx -> F4Mx
+        for i in 0 ..< 5
+        {
+            let k = key( "F\(i)Mx" )
+            if let val = SMCKit.SMC.shared.readAllKeys( { $0 == k } ).first
+            {
+                if let v = val.value as? Double {
+                    maxSpeed = max( maxSpeed, v )
+                } else if let v = val.value as? Float {
+                    maxSpeed = max( maxSpeed, Double(v) )
+                }
+            }
+        }
+        
+        if maxSpeed > 1000 {
+            self.maxFanSpeed = Int( maxSpeed )
+            print( "HOT_DEBUG: Detected Max Fan Speed: \(self.maxFanSpeed)" )
+        }
     }
 
     public override func observeValue( forKeyPath keyPath: String?, of object: Any?, change: [ NSKeyValueChangeKey: Any ]?, context: UnsafeMutableRawPointer? )
@@ -114,6 +191,17 @@ public class InfoViewController: NSViewController
         RunLoop.main.add( timer, forMode: .common )
 
         self.timer = timer
+    }
+    
+    public override func viewDidLayout()
+    {
+        super.viewDidLayout()
+        
+        if let btn = self.fanModeDropdown
+        {
+            print( "HOT_DEBUG: viewDidLayout - Dropdown Frame: \(btn.frame), Superview Frame: \(btn.superview?.frame ?? .zero)" )
+            print( "HOT_DEBUG: viewDidLayout - Dropdown Hidden: \(btn.isHidden), Enabled: \(btn.isEnabled)" )
+        }
     }
 
     private func update()
@@ -158,6 +246,14 @@ public class InfoViewController: NSViewController
         else if self.temperature > 0
         {
             self.graphView?.addData( speed: 100, temperature: self.temperature )
+        }
+        
+        // Update Fan Graph
+        if let rpm = self.log.fanSpeed?.intValue
+        {
+            let normalized = Int( ( Double( rpm ) / Double( self.maxFanSpeed ) ) * 100.0 )
+            // Pass to speed parameter (Blue line)
+            self.fanGraphView?.addData( speed: normalized, temperature: 0 )
         }
 
         self.graphViewHeight.constant = self.graphView?.canDisplay ?? false ? 100 : 0
