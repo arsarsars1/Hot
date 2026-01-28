@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// The MIT License (MIT)
+// 
+// Copyright (c) 2017 Jean-David Gadina - www.xs-labs.com
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+// -----------------------------------------------------------------------------
+
+#include "Warnings/All-Languages.xcconfig"
+#include "Warnings/C++.xcconfig"
+#include "Warnings/Objective-C-ARC.xcconfig"
+#include "Warnings/Objective-C.xcconfig"
+
+WARNING_CFLAGS = -Wall -Wextra -Wpedantic -Warc-repeated-use-of-weak -Warray-bounds-pointer-arithmetic -Wassign-enum -Watomic-properties -Wbad-function-cast -Wbitfield-enum-conversion -Wcast-align -Wcast-qual -Wcomma -Wconditional-uninitialized -Wconversion -Wcovered-switch-default -Wcustom-atomic-properties -Wdate-time -Wdeprecated -Wdouble-promotion -Wduplicate-enum -Wduplicate-method-arg -Wduplicate-method-match -Wexit-time-destructors -Wexplicit-ownership-type -Wflexible-array-extensions -Wfloat-conversion -Wfloat-equal -Wglobal-constructors -Wgnu -Wheader-hygiene -Widiomatic-parentheses -Wimplicit -Wimplicit-atomic-properties -Wimplicit-fallthrough -Wimplicit-retain-self -Winconsistent-missing-destructor-override -Wmethod-signatures -Wmicrosoft -Wmissing-noreturn -Wmissing-prototypes -Wmissing-variable-declarations -Wnewline-eof -Wnon-virtual-dtor -Wnonportable-system-include-path -Wnullable-to-nonnull-conversion -Wold-style-cast -Wover-aligned -Woverriding-method-mismatch -Wreceiver-forward-class -Wredundant-parens -Wreserved-id-macro -Wshadow-all -Wshift-sign-overflow -Wshorten-64-to-32 -Wsign-conversion -Wsometimes-uninitialized -Wstatic-in-inline -Wstrict-prototypes -Wstring-conversion -Wswitch-enum -Wtautological-compare -Wundeclared-selector -Wundef -Wundefined-reinterpret-cast -Wunneeded-internal-declaration -Wunneeded-member-function -Wunreachable-code-aggressive -Wunused -Wvector-conversion -Wzero-as-null-pointer-constant

@@ -1,0 +1,700 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		058B8DF1299418B400263FE9 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD73912992F27800CF4FD7 /* Task.swift */; };
+		058B8DF2299418B400263FE9 /* SMCDump.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD738C2992EB4600CF4FD7 /* SMCDump.swift */; };
+		058B8DF3299418B400263FE9 /* MachineDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD738E2992EF0B00CF4FD7 /* MachineDetails.swift */; };
+		058B8DF4299418B500263FE9 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD73912992F27800CF4FD7 /* Task.swift */; };
+		058B8DF5299418B500263FE9 /* SMCDump.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD738C2992EB4600CF4FD7 /* SMCDump.swift */; };
+		058B8DF6299418B500263FE9 /* MachineDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD738E2992EF0B00CF4FD7 /* MachineDetails.swift */; };
+		058B8DF9299418E900263FE9 /* SMCException.h in Headers */ = {isa = PBXBuildFile; fileRef = 058B8DF7299418E900263FE9 /* SMCException.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		058B8DFA299418E900263FE9 /* SMCException.m in Sources */ = {isa = PBXBuildFile; fileRef = 058B8DF8299418E900263FE9 /* SMCException.m */; };
+		058B8DFB29941AE800263FE9 /* SMCException.m in Sources */ = {isa = PBXBuildFile; fileRef = 058B8DF8299418E900263FE9 /* SMCException.m */; };
+		05BD7286299275AB00CF4FD7 /* SMCKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 05BD7285299275AB00CF4FD7 /* SMCKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		05BD731E2992AD0600CF4FD7 /* SMC.m in Sources */ = {isa = PBXBuildFile; fileRef = 05BD731B2992AD0600CF4FD7 /* SMC.m */; };
+		05BD731F2992AD0600CF4FD7 /* SMC-Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 05BD731C2992AD0600CF4FD7 /* SMC-Internal.h */; };
+		05BD73202992AD0600CF4FD7 /* SMC.h in Headers */ = {isa = PBXBuildFile; fileRef = 05BD731D2992AD0600CF4FD7 /* SMC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		05BD73752992D2E300CF4FD7 /* SMC.m in Sources */ = {isa = PBXBuildFile; fileRef = 05BD731B2992AD0600CF4FD7 /* SMC.m */; };
+		05BD73832992D35900CF4FD7 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD73822992D35900CF4FD7 /* main.swift */; };
+		05BD73882992D3B000CF4FD7 /* libSMC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 05BD736A2992D23800CF4FD7 /* libSMC.a */; };
+		05BD746F299404CD00CF4FD7 /* SMCData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD746E299404CD00CF4FD7 /* SMCData.swift */; };
+		05BD7470299404CD00CF4FD7 /* SMCData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD746E299404CD00CF4FD7 /* SMCData.swift */; };
+		05BD7474299408E200CF4FD7 /* SMCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD7473299408E200CF4FD7 /* SMCHelper.swift */; };
+		05BD7475299408E200CF4FD7 /* SMCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BD7473299408E200CF4FD7 /* SMCHelper.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		05BD73892992D3B300CF4FD7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05BD7279299275AB00CF4FD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 05BD73692992D23800CF4FD7;
+			remoteInfo = SMC;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		05BD737E2992D35900CF4FD7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		058B8DF7299418E900263FE9 /* SMCException.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMCException.h; sourceTree = "<group>"; };
+		058B8DF8299418E900263FE9 /* SMCException.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SMCException.m; sourceTree = "<group>"; };
+		058B8DFC29941D5F00263FE9 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		058B8DFD29941D5F00263FE9 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
+		058B8DFE29941D5F00263FE9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		05BD7282299275AB00CF4FD7 /* SMCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SMCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		05BD7285299275AB00CF4FD7 /* SMCKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMCKit.h; sourceTree = "<group>"; };
+		05BD72BF299290A000CF4FD7 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
+		05BD72C0299290A000CF4FD7 /* Release - ccache.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - ccache.xcconfig"; sourceTree = "<group>"; };
+		05BD72C1299290A000CF4FD7 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		05BD72C2299290A000CF4FD7 /* Debug - ccache.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - ccache.xcconfig"; sourceTree = "<group>"; };
+		05BD72C3299290A000CF4FD7 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		05BD72C4299290A000CF4FD7 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		05BD72C5299290A000CF4FD7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		05BD72C6299290A000CF4FD7 /* Release - Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - Library.xcconfig"; sourceTree = "<group>"; };
+		05BD72C8299290A000CF4FD7 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		05BD72C9299290A000CF4FD7 /* Architectures.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Architectures.xcconfig; sourceTree = "<group>"; };
+		05BD72CB299290A000CF4FD7 /* Issues.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Issues.xcconfig; sourceTree = "<group>"; };
+		05BD72CD299290A000CF4FD7 /* Apple-APIs.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apple-APIs.xcconfig"; sourceTree = "<group>"; };
+		05BD72CE299290A000CF4FD7 /* Generic-Issues.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Generic-Issues.xcconfig"; sourceTree = "<group>"; };
+		05BD72CF299290A000CF4FD7 /* Security.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Security.xcconfig; sourceTree = "<group>"; };
+		05BD72D0299290A000CF4FD7 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05BD72D1299290A000CF4FD7 /* Analysis-Policy.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Analysis-Policy.xcconfig"; sourceTree = "<group>"; };
+		05BD72D2299290A000CF4FD7 /* Deployment.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Deployment.xcconfig; sourceTree = "<group>"; };
+		05BD72D3299290A000CF4FD7 /* Build-Options.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Build-Options.xcconfig"; sourceTree = "<group>"; };
+		05BD72D4299290A000CF4FD7 /* Swift-Compiler.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Swift-Compiler.xcconfig"; sourceTree = "<group>"; };
+		05BD72D5299290A000CF4FD7 /* Static-Analyzer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Static-Analyzer.xcconfig"; sourceTree = "<group>"; };
+		05BD72D7299290A000CF4FD7 /* Warnings-Policies.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Warnings-Policies.xcconfig"; sourceTree = "<group>"; };
+		05BD72D8299290A000CF4FD7 /* Code-Generation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Code-Generation.xcconfig"; sourceTree = "<group>"; };
+		05BD72D9299290A000CF4FD7 /* Language.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Language.xcconfig; sourceTree = "<group>"; };
+		05BD72DA299290A000CF4FD7 /* General.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = General.xcconfig; sourceTree = "<group>"; };
+		05BD72DB299290A000CF4FD7 /* Search-Paths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Search-Paths.xcconfig"; sourceTree = "<group>"; };
+		05BD72DC299290A000CF4FD7 /* Apple-LLVM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apple-LLVM.xcconfig"; sourceTree = "<group>"; };
+		05BD72DF299290A000CF4FD7 /* Modules.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modules.xcconfig; sourceTree = "<group>"; };
+		05BD72E0299290A000CF4FD7 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05BD72E1299290A000CF4FD7 /* C++.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "C++.xcconfig"; sourceTree = "<group>"; };
+		05BD72E2299290A000CF4FD7 /* Code-Generation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Code-Generation.xcconfig"; sourceTree = "<group>"; };
+		05BD72E3299290A000CF4FD7 /* Address-Sanitizer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Address-Sanitizer.xcconfig"; sourceTree = "<group>"; };
+		05BD72E4299290A000CF4FD7 /* Language.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Language.xcconfig; sourceTree = "<group>"; };
+		05BD72E5299290A000CF4FD7 /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
+		05BD72E6299290A000CF4FD7 /* Undefined-Behavior-Sanitizer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Undefined-Behavior-Sanitizer.xcconfig"; sourceTree = "<group>"; };
+		05BD72E7299290A000CF4FD7 /* Warning-Policies.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Warning-Policies.xcconfig"; sourceTree = "<group>"; };
+		05BD72E9299290A000CF4FD7 /* Objective-C-ARC.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C-ARC.xcconfig"; sourceTree = "<group>"; };
+		05BD72EA299290A000CF4FD7 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05BD72EB299290A000CF4FD7 /* C++.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "C++.xcconfig"; sourceTree = "<group>"; };
+		05BD72EC299290A000CF4FD7 /* All-Languages.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "All-Languages.xcconfig"; sourceTree = "<group>"; };
+		05BD72ED299290A000CF4FD7 /* Preprocessing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Preprocessing.xcconfig; sourceTree = "<group>"; };
+		05BD72EE299290A000CF4FD7 /* Debug - Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - Library.xcconfig"; sourceTree = "<group>"; };
+		05BD72EF299290A000CF4FD7 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		05BD72F1299290A000CF4FD7 /* ccache-config.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "ccache-config.sh"; sourceTree = "<group>"; };
+		05BD72F2299290A000CF4FD7 /* ccache.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ccache.sh; sourceTree = "<group>"; };
+		05BD72F4299290A000CF4FD7 /* FUNDING.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = FUNDING.yml; sourceTree = "<group>"; };
+		05BD72F5299290A000CF4FD7 /* Debug - zld.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - zld.xcconfig"; sourceTree = "<group>"; };
+		05BD731B2992AD0600CF4FD7 /* SMC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMC.m; sourceTree = "<group>"; };
+		05BD731C2992AD0600CF4FD7 /* SMC-Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SMC-Internal.h"; sourceTree = "<group>"; };
+		05BD731D2992AD0600CF4FD7 /* SMC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMC.h; sourceTree = "<group>"; };
+		05BD736A2992D23800CF4FD7 /* libSMC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSMC.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		05BD73802992D35900CF4FD7 /* smc-dump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "smc-dump"; sourceTree = BUILT_PRODUCTS_DIR; };
+		05BD73822992D35900CF4FD7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		05BD738C2992EB4600CF4FD7 /* SMCDump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCDump.swift; sourceTree = "<group>"; };
+		05BD738E2992EF0B00CF4FD7 /* MachineDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachineDetails.swift; sourceTree = "<group>"; };
+		05BD73912992F27800CF4FD7 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		05BD746E299404CD00CF4FD7 /* SMCData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCData.swift; sourceTree = "<group>"; };
+		05BD7471299405E000CF4FD7 /* SMCKit.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = SMCKit.modulemap; sourceTree = "<group>"; };
+		05BD74722994074E00CF4FD7 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		05BD7473299408E200CF4FD7 /* SMCHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCHelper.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		05BD727F299275AB00CF4FD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05BD73682992D23800CF4FD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05BD737D2992D35900CF4FD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05BD73882992D3B000CF4FD7 /* libSMC.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		05BD7278299275AB00CF4FD7 = {
+			isa = PBXGroup;
+			children = (
+				058B8DFD29941D5F00263FE9 /* CODE_OF_CONDUCT.md */,
+				058B8DFC29941D5F00263FE9 /* LICENSE */,
+				058B8DFE29941D5F00263FE9 /* README.md */,
+				05BD72BE299290A000CF4FD7 /* xcconfig */,
+				05BD7284299275AB00CF4FD7 /* SMCKit */,
+				05BD73812992D35900CF4FD7 /* smc-dump */,
+				05BD7283299275AB00CF4FD7 /* Products */,
+				05BD73872992D3AF00CF4FD7 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		05BD7283299275AB00CF4FD7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				05BD7282299275AB00CF4FD7 /* SMCKit.framework */,
+				05BD736A2992D23800CF4FD7 /* libSMC.a */,
+				05BD73802992D35900CF4FD7 /* smc-dump */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		05BD7284299275AB00CF4FD7 /* SMCKit */ = {
+			isa = PBXGroup;
+			children = (
+				05BD7471299405E000CF4FD7 /* SMCKit.modulemap */,
+				05BD74722994074E00CF4FD7 /* Bridging-Header.h */,
+				05BD7285299275AB00CF4FD7 /* SMCKit.h */,
+				05BD731C2992AD0600CF4FD7 /* SMC-Internal.h */,
+				05BD731D2992AD0600CF4FD7 /* SMC.h */,
+				05BD731B2992AD0600CF4FD7 /* SMC.m */,
+				058B8DF7299418E900263FE9 /* SMCException.h */,
+				058B8DF8299418E900263FE9 /* SMCException.m */,
+				05BD746E299404CD00CF4FD7 /* SMCData.swift */,
+				05BD7473299408E200CF4FD7 /* SMCHelper.swift */,
+				05BD738C2992EB4600CF4FD7 /* SMCDump.swift */,
+				05BD738E2992EF0B00CF4FD7 /* MachineDetails.swift */,
+				05BD73912992F27800CF4FD7 /* Task.swift */,
+			);
+			path = SMCKit;
+			sourceTree = "<group>";
+		};
+		05BD72BE299290A000CF4FD7 /* xcconfig */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72BF299290A000CF4FD7 /* CODE_OF_CONDUCT.md */,
+				05BD72C0299290A000CF4FD7 /* Release - ccache.xcconfig */,
+				05BD72C1299290A000CF4FD7 /* Common.xcconfig */,
+				05BD72C2299290A000CF4FD7 /* Debug - ccache.xcconfig */,
+				05BD72C3299290A000CF4FD7 /* Debug.xcconfig */,
+				05BD72C4299290A000CF4FD7 /* Release.xcconfig */,
+				05BD72C5299290A000CF4FD7 /* README.md */,
+				05BD72C6299290A000CF4FD7 /* Release - Library.xcconfig */,
+				05BD72C7299290A000CF4FD7 /* Common */,
+				05BD72EE299290A000CF4FD7 /* Debug - Library.xcconfig */,
+				05BD72EF299290A000CF4FD7 /* .gitignore */,
+				05BD72F0299290A000CF4FD7 /* Scripts */,
+				05BD72F3299290A000CF4FD7 /* .github */,
+				05BD72F5299290A000CF4FD7 /* Debug - zld.xcconfig */,
+			);
+			name = xcconfig;
+			path = Submodules/xcconfig;
+			sourceTree = "<group>";
+		};
+		05BD72C7299290A000CF4FD7 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72C8299290A000CF4FD7 /* Signing.xcconfig */,
+				05BD72C9299290A000CF4FD7 /* Architectures.xcconfig */,
+				05BD72CA299290A000CF4FD7 /* Static-Analyzer */,
+				05BD72D2299290A000CF4FD7 /* Deployment.xcconfig */,
+				05BD72D3299290A000CF4FD7 /* Build-Options.xcconfig */,
+				05BD72D4299290A000CF4FD7 /* Swift-Compiler.xcconfig */,
+				05BD72D5299290A000CF4FD7 /* Static-Analyzer.xcconfig */,
+				05BD72D6299290A000CF4FD7 /* Swift-Compiler */,
+				05BD72DB299290A000CF4FD7 /* Search-Paths.xcconfig */,
+				05BD72DC299290A000CF4FD7 /* Apple-LLVM.xcconfig */,
+				05BD72DD299290A000CF4FD7 /* Apple-LLVM */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		05BD72CA299290A000CF4FD7 /* Static-Analyzer */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72CB299290A000CF4FD7 /* Issues.xcconfig */,
+				05BD72CC299290A000CF4FD7 /* Issues */,
+			);
+			path = "Static-Analyzer";
+			sourceTree = "<group>";
+		};
+		05BD72CC299290A000CF4FD7 /* Issues */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72CD299290A000CF4FD7 /* Apple-APIs.xcconfig */,
+				05BD72CE299290A000CF4FD7 /* Generic-Issues.xcconfig */,
+				05BD72CF299290A000CF4FD7 /* Security.xcconfig */,
+				05BD72D0299290A000CF4FD7 /* Objective-C.xcconfig */,
+				05BD72D1299290A000CF4FD7 /* Analysis-Policy.xcconfig */,
+			);
+			path = Issues;
+			sourceTree = "<group>";
+		};
+		05BD72D6299290A000CF4FD7 /* Swift-Compiler */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72D7299290A000CF4FD7 /* Warnings-Policies.xcconfig */,
+				05BD72D8299290A000CF4FD7 /* Code-Generation.xcconfig */,
+				05BD72D9299290A000CF4FD7 /* Language.xcconfig */,
+				05BD72DA299290A000CF4FD7 /* General.xcconfig */,
+			);
+			path = "Swift-Compiler";
+			sourceTree = "<group>";
+		};
+		05BD72DD299290A000CF4FD7 /* Apple-LLVM */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72DE299290A000CF4FD7 /* Language */,
+				05BD72E2299290A000CF4FD7 /* Code-Generation.xcconfig */,
+				05BD72E3299290A000CF4FD7 /* Address-Sanitizer.xcconfig */,
+				05BD72E4299290A000CF4FD7 /* Language.xcconfig */,
+				05BD72E5299290A000CF4FD7 /* Warnings.xcconfig */,
+				05BD72E6299290A000CF4FD7 /* Undefined-Behavior-Sanitizer.xcconfig */,
+				05BD72E7299290A000CF4FD7 /* Warning-Policies.xcconfig */,
+				05BD72E8299290A000CF4FD7 /* Warnings */,
+				05BD72ED299290A000CF4FD7 /* Preprocessing.xcconfig */,
+			);
+			path = "Apple-LLVM";
+			sourceTree = "<group>";
+		};
+		05BD72DE299290A000CF4FD7 /* Language */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72DF299290A000CF4FD7 /* Modules.xcconfig */,
+				05BD72E0299290A000CF4FD7 /* Objective-C.xcconfig */,
+				05BD72E1299290A000CF4FD7 /* C++.xcconfig */,
+			);
+			path = Language;
+			sourceTree = "<group>";
+		};
+		05BD72E8299290A000CF4FD7 /* Warnings */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72E9299290A000CF4FD7 /* Objective-C-ARC.xcconfig */,
+				05BD72EA299290A000CF4FD7 /* Objective-C.xcconfig */,
+				05BD72EB299290A000CF4FD7 /* C++.xcconfig */,
+				05BD72EC299290A000CF4FD7 /* All-Languages.xcconfig */,
+			);
+			path = Warnings;
+			sourceTree = "<group>";
+		};
+		05BD72F0299290A000CF4FD7 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72F1299290A000CF4FD7 /* ccache-config.sh */,
+				05BD72F2299290A000CF4FD7 /* ccache.sh */,
+			);
+			path = Scripts;
+			sourceTree = "<group>";
+		};
+		05BD72F3299290A000CF4FD7 /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				05BD72F4299290A000CF4FD7 /* FUNDING.yml */,
+			);
+			path = .github;
+			sourceTree = "<group>";
+		};
+		05BD73812992D35900CF4FD7 /* smc-dump */ = {
+			isa = PBXGroup;
+			children = (
+				05BD73822992D35900CF4FD7 /* main.swift */,
+			);
+			path = "smc-dump";
+			sourceTree = "<group>";
+		};
+		05BD73872992D3AF00CF4FD7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		05BD727D299275AB00CF4FD7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8DF9299418E900263FE9 /* SMCException.h in Headers */,
+				05BD731F2992AD0600CF4FD7 /* SMC-Internal.h in Headers */,
+				05BD73202992AD0600CF4FD7 /* SMC.h in Headers */,
+				05BD7286299275AB00CF4FD7 /* SMCKit.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05BD73662992D23800CF4FD7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		05BD7281299275AB00CF4FD7 /* SMCKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05BD7289299275AB00CF4FD7 /* Build configuration list for PBXNativeTarget "SMCKit" */;
+			buildPhases = (
+				05BD727D299275AB00CF4FD7 /* Headers */,
+				05BD727E299275AB00CF4FD7 /* Sources */,
+				05BD727F299275AB00CF4FD7 /* Frameworks */,
+				05BD7280299275AB00CF4FD7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SMCKit;
+			productName = IOHIDKit;
+			productReference = 05BD7282299275AB00CF4FD7 /* SMCKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		05BD73692992D23800CF4FD7 /* SMC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05BD73722992D23800CF4FD7 /* Build configuration list for PBXNativeTarget "SMC" */;
+			buildPhases = (
+				05BD73662992D23800CF4FD7 /* Headers */,
+				05BD73672992D23800CF4FD7 /* Sources */,
+				05BD73682992D23800CF4FD7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SMC;
+			productName = SMC;
+			productReference = 05BD736A2992D23800CF4FD7 /* libSMC.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		05BD737F2992D35900CF4FD7 /* smc-dump */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05BD73842992D35900CF4FD7 /* Build configuration list for PBXNativeTarget "smc-dump" */;
+			buildPhases = (
+				05BD737C2992D35900CF4FD7 /* Sources */,
+				05BD737D2992D35900CF4FD7 /* Frameworks */,
+				05BD737E2992D35900CF4FD7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05BD738A2992D3B300CF4FD7 /* PBXTargetDependency */,
+			);
+			name = "smc-dump";
+			productName = "smc-dump";
+			productReference = 05BD73802992D35900CF4FD7 /* smc-dump */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		05BD7279299275AB00CF4FD7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					05BD7281299275AB00CF4FD7 = {
+						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
+					};
+					05BD73692992D23800CF4FD7 = {
+						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
+					};
+					05BD737F2992D35900CF4FD7 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = 05BD727C299275AB00CF4FD7 /* Build configuration list for PBXProject "SMCKit" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 05BD7278299275AB00CF4FD7;
+			productRefGroup = 05BD7283299275AB00CF4FD7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				05BD7281299275AB00CF4FD7 /* SMCKit */,
+				05BD73692992D23800CF4FD7 /* SMC */,
+				05BD737F2992D35900CF4FD7 /* smc-dump */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		05BD7280299275AB00CF4FD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		05BD727E299275AB00CF4FD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8DFA299418E900263FE9 /* SMCException.m in Sources */,
+				058B8DF6299418B500263FE9 /* MachineDetails.swift in Sources */,
+				058B8DF4299418B500263FE9 /* Task.swift in Sources */,
+				058B8DF5299418B500263FE9 /* SMCDump.swift in Sources */,
+				05BD7474299408E200CF4FD7 /* SMCHelper.swift in Sources */,
+				05BD746F299404CD00CF4FD7 /* SMCData.swift in Sources */,
+				05BD731E2992AD0600CF4FD7 /* SMC.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05BD73672992D23800CF4FD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8DF3299418B400263FE9 /* MachineDetails.swift in Sources */,
+				058B8DF1299418B400263FE9 /* Task.swift in Sources */,
+				058B8DF2299418B400263FE9 /* SMCDump.swift in Sources */,
+				05BD73752992D2E300CF4FD7 /* SMC.m in Sources */,
+				058B8DFB29941AE800263FE9 /* SMCException.m in Sources */,
+				05BD7475299408E200CF4FD7 /* SMCHelper.swift in Sources */,
+				05BD7470299404CD00CF4FD7 /* SMCData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05BD737C2992D35900CF4FD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05BD73832992D35900CF4FD7 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05BD738A2992D3B300CF4FD7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 05BD73692992D23800CF4FD7 /* SMC */;
+			targetProxy = 05BD73892992D3B300CF4FD7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		05BD7287299275AB00CF4FD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05BD72C3299290A000CF4FD7 /* Debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 326Y53CJMD;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+			};
+			name = Debug;
+		};
+		05BD7288299275AB00CF4FD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05BD72C4299290A000CF4FD7 /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 326Y53CJMD;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+			};
+			name = Release;
+		};
+		05BD728A299275AB00CF4FD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05BD72EE299290A000CF4FD7 /* Debug - Library.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 XS-Labs. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xs-labs.SMCKit";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		05BD728B299275AB00CF4FD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05BD72C6299290A000CF4FD7 /* Release - Library.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 XS-Labs. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xs-labs.SMCKit";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		05BD73702992D23800CF4FD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"SMC_STATIC=1",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SMCKit/Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		05BD73712992D23800CF4FD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"SMC_STATIC=1",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SMCKit/Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		05BD73852992D35900CF4FD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		05BD73862992D35900CF4FD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		05BD727C299275AB00CF4FD7 /* Build configuration list for PBXProject "SMCKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05BD7287299275AB00CF4FD7 /* Debug */,
+				05BD7288299275AB00CF4FD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05BD7289299275AB00CF4FD7 /* Build configuration list for PBXNativeTarget "SMCKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05BD728A299275AB00CF4FD7 /* Debug */,
+				05BD728B299275AB00CF4FD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05BD73722992D23800CF4FD7 /* Build configuration list for PBXNativeTarget "SMC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05BD73702992D23800CF4FD7 /* Debug */,
+				05BD73712992D23800CF4FD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05BD73842992D35900CF4FD7 /* Build configuration list for PBXNativeTarget "smc-dump" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05BD73852992D35900CF4FD7 /* Debug */,
+				05BD73862992D35900CF4FD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 05BD7279299275AB00CF4FD7 /* Project object */;
+}

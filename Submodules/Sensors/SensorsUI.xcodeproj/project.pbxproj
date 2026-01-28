@@ -1,0 +1,536 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		058B8EB02994386700263FE9 /* ArrayIsNotEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B97526875012006EE45A /* ArrayIsNotEmpty.swift */; };
+		058B8EB12994386700263FE9 /* SensorIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B93B26864187006EE45A /* SensorIcon.swift */; };
+		058B8EB22994386700263FE9 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B95226865B60006EE45A /* NSImage.swift */; };
+		058B8EB32994386700263FE9 /* SensorGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B94826864627006EE45A /* SensorGraphView.swift */; };
+		058B8EB42994386700263FE9 /* SensorsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05646BF62685064C00707676 /* SensorsWindowController.swift */; };
+		058B8EB52994386700263FE9 /* ArrayIsEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B97126874FD3006EE45A /* ArrayIsEmpty.swift */; };
+		058B8EB62994386700263FE9 /* SensorValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B94626864492006EE45A /* SensorValue.swift */; };
+		058B8EB72994386700263FE9 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0566B95426865C78006EE45A /* Colors.swift */; };
+		058B8EB82994386700263FE9 /* SensorItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E0C31B268635C300D1D216 /* SensorItem.swift */; };
+		058B8EB92994386B00263FE9 /* SensorsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05646BF82685072900707676 /* SensorsWindowController.xib */; };
+		058B8EBA2994386B00263FE9 /* SensorItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E0C31D268635F200D1D216 /* SensorItem.xib */; };
+		058B8EBB2994386E00263FE9 /* CurrentTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0566B9402686438E006EE45A /* CurrentTemplate.pdf */; };
+		058B8EBC2994386E00263FE9 /* ThermalTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0566B9412686438E006EE45A /* ThermalTemplate.pdf */; };
+		058B8EBD2994386E00263FE9 /* VoltageTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0566B93F2686438E006EE45A /* VoltageTemplate.pdf */; };
+		058B8EBE2994387900263FE9 /* SensorsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 058B8E96299436D900263FE9 /* SensorsKit.framework */; };
+		058B8EBF2994387900263FE9 /* SensorsKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 058B8E96299436D900263FE9 /* SensorsKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		05BDE9EE29944B9D00B0B888 /* AmbiantLightTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 05BDE9EC29944B9D00B0B888 /* AmbiantLightTemplate.pdf */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		058B8E95299436D900263FE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 058B8E8F299436D900263FE9 /* SensorsKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 05BD7282299275AB00CF4FD7;
+			remoteInfo = SensorsKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		058B8EC02994387900263FE9 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				058B8EBF2994387900263FE9 /* SensorsKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		05646BB8268503D300707676 /* Release - ccache.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - ccache.xcconfig"; sourceTree = "<group>"; };
+		05646BB9268503D300707676 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		05646BBA268503D300707676 /* Debug - ccache.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - ccache.xcconfig"; sourceTree = "<group>"; };
+		05646BBB268503D300707676 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		05646BBC268503D300707676 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		05646BBD268503D300707676 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		05646BBE268503D300707676 /* Release - Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - Library.xcconfig"; sourceTree = "<group>"; };
+		05646BC0268503D300707676 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		05646BC1268503D300707676 /* Architectures.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Architectures.xcconfig; sourceTree = "<group>"; };
+		05646BC3268503D300707676 /* Issues.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Issues.xcconfig; sourceTree = "<group>"; };
+		05646BC5268503D300707676 /* Apple-APIs.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apple-APIs.xcconfig"; sourceTree = "<group>"; };
+		05646BC6268503D300707676 /* Generic-Issues.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Generic-Issues.xcconfig"; sourceTree = "<group>"; };
+		05646BC7268503D300707676 /* Security.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Security.xcconfig; sourceTree = "<group>"; };
+		05646BC8268503D300707676 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05646BC9268503D300707676 /* Analysis-Policy.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Analysis-Policy.xcconfig"; sourceTree = "<group>"; };
+		05646BCA268503D300707676 /* Deployment.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Deployment.xcconfig; sourceTree = "<group>"; };
+		05646BCB268503D300707676 /* Build-Options.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Build-Options.xcconfig"; sourceTree = "<group>"; };
+		05646BCC268503D300707676 /* Swift-Compiler.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Swift-Compiler.xcconfig"; sourceTree = "<group>"; };
+		05646BCD268503D300707676 /* Static-Analyzer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Static-Analyzer.xcconfig"; sourceTree = "<group>"; };
+		05646BCF268503D300707676 /* Warnings-Policies.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Warnings-Policies.xcconfig"; sourceTree = "<group>"; };
+		05646BD0268503D300707676 /* Code-Generation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Code-Generation.xcconfig"; sourceTree = "<group>"; };
+		05646BD1268503D300707676 /* Language.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Language.xcconfig; sourceTree = "<group>"; };
+		05646BD2268503D300707676 /* General.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = General.xcconfig; sourceTree = "<group>"; };
+		05646BD3268503D300707676 /* Search-Paths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Search-Paths.xcconfig"; sourceTree = "<group>"; };
+		05646BD4268503D300707676 /* Apple-LLVM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apple-LLVM.xcconfig"; sourceTree = "<group>"; };
+		05646BD7268503D300707676 /* Modules.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modules.xcconfig; sourceTree = "<group>"; };
+		05646BD8268503D300707676 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05646BD9268503D300707676 /* C++.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "C++.xcconfig"; sourceTree = "<group>"; };
+		05646BDA268503D300707676 /* Code-Generation.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Code-Generation.xcconfig"; sourceTree = "<group>"; };
+		05646BDB268503D300707676 /* Address-Sanitizer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Address-Sanitizer.xcconfig"; sourceTree = "<group>"; };
+		05646BDC268503D300707676 /* Language.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Language.xcconfig; sourceTree = "<group>"; };
+		05646BDD268503D300707676 /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
+		05646BDE268503D300707676 /* Undefined-Behavior-Sanitizer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Undefined-Behavior-Sanitizer.xcconfig"; sourceTree = "<group>"; };
+		05646BDF268503D300707676 /* Warning-Policies.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Warning-Policies.xcconfig"; sourceTree = "<group>"; };
+		05646BE1268503D300707676 /* Objective-C-ARC.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C-ARC.xcconfig"; sourceTree = "<group>"; };
+		05646BE2268503D300707676 /* Objective-C.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Objective-C.xcconfig"; sourceTree = "<group>"; };
+		05646BE3268503D300707676 /* C++.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "C++.xcconfig"; sourceTree = "<group>"; };
+		05646BE4268503D300707676 /* All-Languages.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "All-Languages.xcconfig"; sourceTree = "<group>"; };
+		05646BE5268503D300707676 /* Preprocessing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Preprocessing.xcconfig; sourceTree = "<group>"; };
+		05646BE6268503D300707676 /* Debug - Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - Library.xcconfig"; sourceTree = "<group>"; };
+		05646BE7268503D300707676 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		05646BE9268503D300707676 /* ccache-config.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "ccache-config.sh"; sourceTree = "<group>"; };
+		05646BEA268503D300707676 /* ccache.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ccache.sh; sourceTree = "<group>"; };
+		05646BEB268503D300707676 /* Debug - zld.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug - zld.xcconfig"; sourceTree = "<group>"; };
+		05646BF62685064C00707676 /* SensorsWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorsWindowController.swift; sourceTree = "<group>"; };
+		05646BF92685072900707676 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SensorsWindowController.xib; sourceTree = "<group>"; };
+		0566B93B26864187006EE45A /* SensorIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorIcon.swift; sourceTree = "<group>"; };
+		0566B93F2686438E006EE45A /* VoltageTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = VoltageTemplate.pdf; sourceTree = "<group>"; };
+		0566B9402686438E006EE45A /* CurrentTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = CurrentTemplate.pdf; sourceTree = "<group>"; };
+		0566B9412686438E006EE45A /* ThermalTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ThermalTemplate.pdf; sourceTree = "<group>"; };
+		0566B94626864492006EE45A /* SensorValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorValue.swift; sourceTree = "<group>"; };
+		0566B94826864627006EE45A /* SensorGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorGraphView.swift; sourceTree = "<group>"; };
+		0566B95226865B60006EE45A /* NSImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
+		0566B95426865C78006EE45A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		0566B97126874FD3006EE45A /* ArrayIsEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayIsEmpty.swift; sourceTree = "<group>"; };
+		0566B97526875012006EE45A /* ArrayIsNotEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayIsNotEmpty.swift; sourceTree = "<group>"; };
+		058B8E8F299436D900263FE9 /* SensorsKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SensorsKit.xcodeproj; path = Submodules/SensorsKit/SensorsKit.xcodeproj; sourceTree = "<group>"; };
+		058B8EA22994383300263FE9 /* SensorsUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SensorsUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		058B8EEB2994419B00263FE9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		058B8EED2994419B00263FE9 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		058B8EEE2994419B00263FE9 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
+		05BDE9EC29944B9D00B0B888 /* AmbiantLightTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AmbiantLightTemplate.pdf; sourceTree = "<group>"; };
+		05E0C31B268635C300D1D216 /* SensorItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorItem.swift; sourceTree = "<group>"; };
+		05E0C31E268635F200D1D216 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SensorItem.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		058B8E9F2994383300263FE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8EBE2994387900263FE9 /* SensorsKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		05646B91268501B300707676 = {
+			isa = PBXGroup;
+			children = (
+				058B8EEE2994419B00263FE9 /* CODE_OF_CONDUCT.md */,
+				058B8EED2994419B00263FE9 /* LICENSE */,
+				058B8EEB2994419B00263FE9 /* README.md */,
+				058B8E8F299436D900263FE9 /* SensorsKit.xcodeproj */,
+				05646BB7268503D300707676 /* xcconfig */,
+				058B8EA32994383300263FE9 /* SensorsUI */,
+				05646B9B268501B300707676 /* Products */,
+				0566B96C2686B531006EE45A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		05646B9B268501B300707676 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				058B8EA22994383300263FE9 /* SensorsUI.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		05646BB7268503D300707676 /* xcconfig */ = {
+			isa = PBXGroup;
+			children = (
+				05646BB8268503D300707676 /* Release - ccache.xcconfig */,
+				05646BB9268503D300707676 /* Common.xcconfig */,
+				05646BBA268503D300707676 /* Debug - ccache.xcconfig */,
+				05646BBB268503D300707676 /* Debug.xcconfig */,
+				05646BBC268503D300707676 /* Release.xcconfig */,
+				05646BBD268503D300707676 /* README.md */,
+				05646BBE268503D300707676 /* Release - Library.xcconfig */,
+				05646BBF268503D300707676 /* Common */,
+				05646BE6268503D300707676 /* Debug - Library.xcconfig */,
+				05646BE7268503D300707676 /* .gitignore */,
+				05646BE8268503D300707676 /* Scripts */,
+				05646BEB268503D300707676 /* Debug - zld.xcconfig */,
+			);
+			name = xcconfig;
+			path = Submodules/xcconfig;
+			sourceTree = "<group>";
+		};
+		05646BBF268503D300707676 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				05646BC0268503D300707676 /* Signing.xcconfig */,
+				05646BC1268503D300707676 /* Architectures.xcconfig */,
+				05646BC2268503D300707676 /* Static-Analyzer */,
+				05646BCA268503D300707676 /* Deployment.xcconfig */,
+				05646BCB268503D300707676 /* Build-Options.xcconfig */,
+				05646BCC268503D300707676 /* Swift-Compiler.xcconfig */,
+				05646BCD268503D300707676 /* Static-Analyzer.xcconfig */,
+				05646BCE268503D300707676 /* Swift-Compiler */,
+				05646BD3268503D300707676 /* Search-Paths.xcconfig */,
+				05646BD4268503D300707676 /* Apple-LLVM.xcconfig */,
+				05646BD5268503D300707676 /* Apple-LLVM */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		05646BC2268503D300707676 /* Static-Analyzer */ = {
+			isa = PBXGroup;
+			children = (
+				05646BC3268503D300707676 /* Issues.xcconfig */,
+				05646BC4268503D300707676 /* Issues */,
+			);
+			path = "Static-Analyzer";
+			sourceTree = "<group>";
+		};
+		05646BC4268503D300707676 /* Issues */ = {
+			isa = PBXGroup;
+			children = (
+				05646BC5268503D300707676 /* Apple-APIs.xcconfig */,
+				05646BC6268503D300707676 /* Generic-Issues.xcconfig */,
+				05646BC7268503D300707676 /* Security.xcconfig */,
+				05646BC8268503D300707676 /* Objective-C.xcconfig */,
+				05646BC9268503D300707676 /* Analysis-Policy.xcconfig */,
+			);
+			path = Issues;
+			sourceTree = "<group>";
+		};
+		05646BCE268503D300707676 /* Swift-Compiler */ = {
+			isa = PBXGroup;
+			children = (
+				05646BCF268503D300707676 /* Warnings-Policies.xcconfig */,
+				05646BD0268503D300707676 /* Code-Generation.xcconfig */,
+				05646BD1268503D300707676 /* Language.xcconfig */,
+				05646BD2268503D300707676 /* General.xcconfig */,
+			);
+			path = "Swift-Compiler";
+			sourceTree = "<group>";
+		};
+		05646BD5268503D300707676 /* Apple-LLVM */ = {
+			isa = PBXGroup;
+			children = (
+				05646BD6268503D300707676 /* Language */,
+				05646BDA268503D300707676 /* Code-Generation.xcconfig */,
+				05646BDB268503D300707676 /* Address-Sanitizer.xcconfig */,
+				05646BDC268503D300707676 /* Language.xcconfig */,
+				05646BDD268503D300707676 /* Warnings.xcconfig */,
+				05646BDE268503D300707676 /* Undefined-Behavior-Sanitizer.xcconfig */,
+				05646BDF268503D300707676 /* Warning-Policies.xcconfig */,
+				05646BE0268503D300707676 /* Warnings */,
+				05646BE5268503D300707676 /* Preprocessing.xcconfig */,
+			);
+			path = "Apple-LLVM";
+			sourceTree = "<group>";
+		};
+		05646BD6268503D300707676 /* Language */ = {
+			isa = PBXGroup;
+			children = (
+				05646BD7268503D300707676 /* Modules.xcconfig */,
+				05646BD8268503D300707676 /* Objective-C.xcconfig */,
+				05646BD9268503D300707676 /* C++.xcconfig */,
+			);
+			path = Language;
+			sourceTree = "<group>";
+		};
+		05646BE0268503D300707676 /* Warnings */ = {
+			isa = PBXGroup;
+			children = (
+				05646BE1268503D300707676 /* Objective-C-ARC.xcconfig */,
+				05646BE2268503D300707676 /* Objective-C.xcconfig */,
+				05646BE3268503D300707676 /* C++.xcconfig */,
+				05646BE4268503D300707676 /* All-Languages.xcconfig */,
+			);
+			path = Warnings;
+			sourceTree = "<group>";
+		};
+		05646BE8268503D300707676 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				05646BE9268503D300707676 /* ccache-config.sh */,
+				05646BEA268503D300707676 /* ccache.sh */,
+			);
+			path = Scripts;
+			sourceTree = "<group>";
+		};
+		0566B93D2686438E006EE45A /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				05BDE9EC29944B9D00B0B888 /* AmbiantLightTemplate.pdf */,
+				0566B9402686438E006EE45A /* CurrentTemplate.pdf */,
+				0566B9412686438E006EE45A /* ThermalTemplate.pdf */,
+				0566B93F2686438E006EE45A /* VoltageTemplate.pdf */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		0566B96C2686B531006EE45A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		058B8E90299436D900263FE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				058B8E96299436D900263FE9 /* SensorsKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		058B8EA32994383300263FE9 /* SensorsUI */ = {
+			isa = PBXGroup;
+			children = (
+				0566B97126874FD3006EE45A /* ArrayIsEmpty.swift */,
+				0566B97526875012006EE45A /* ArrayIsNotEmpty.swift */,
+				0566B95426865C78006EE45A /* Colors.swift */,
+				0566B93D2686438E006EE45A /* Images */,
+				0566B95226865B60006EE45A /* NSImage.swift */,
+				0566B94826864627006EE45A /* SensorGraphView.swift */,
+				0566B93B26864187006EE45A /* SensorIcon.swift */,
+				05E0C31B268635C300D1D216 /* SensorItem.swift */,
+				05E0C31D268635F200D1D216 /* SensorItem.xib */,
+				05646BF62685064C00707676 /* SensorsWindowController.swift */,
+				05646BF82685072900707676 /* SensorsWindowController.xib */,
+				0566B94626864492006EE45A /* SensorValue.swift */,
+			);
+			path = SensorsUI;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		058B8E9D2994383300263FE9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		058B8EA12994383300263FE9 /* SensorsUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 058B8EAF2994383300263FE9 /* Build configuration list for PBXNativeTarget "SensorsUI" */;
+			buildPhases = (
+				058B8E9D2994383300263FE9 /* Headers */,
+				058B8E9E2994383300263FE9 /* Sources */,
+				058B8E9F2994383300263FE9 /* Frameworks */,
+				058B8EA02994383300263FE9 /* Resources */,
+				058B8EC02994387900263FE9 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SensorsUI;
+			productName = SensorsUI;
+			productReference = 058B8EA22994383300263FE9 /* SensorsUI.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		05646B92268501B300707676 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					058B8EA12994383300263FE9 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = 05646B95268501B300707676 /* Build configuration list for PBXProject "SensorsUI" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 05646B91268501B300707676;
+			productRefGroup = 05646B9B268501B300707676 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 058B8E90299436D900263FE9 /* Products */;
+					ProjectRef = 058B8E8F299436D900263FE9 /* SensorsKit.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				058B8EA12994383300263FE9 /* SensorsUI */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		058B8E96299436D900263FE9 /* SensorsKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SensorsKit.framework;
+			remoteRef = 058B8E95299436D900263FE9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		058B8EA02994383300263FE9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8EBC2994386E00263FE9 /* ThermalTemplate.pdf in Resources */,
+				058B8EBA2994386B00263FE9 /* SensorItem.xib in Resources */,
+				058B8EBD2994386E00263FE9 /* VoltageTemplate.pdf in Resources */,
+				058B8EB92994386B00263FE9 /* SensorsWindowController.xib in Resources */,
+				05BDE9EE29944B9D00B0B888 /* AmbiantLightTemplate.pdf in Resources */,
+				058B8EBB2994386E00263FE9 /* CurrentTemplate.pdf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		058B8E9E2994383300263FE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				058B8EB12994386700263FE9 /* SensorIcon.swift in Sources */,
+				058B8EB72994386700263FE9 /* Colors.swift in Sources */,
+				058B8EB22994386700263FE9 /* NSImage.swift in Sources */,
+				058B8EB02994386700263FE9 /* ArrayIsNotEmpty.swift in Sources */,
+				058B8EB62994386700263FE9 /* SensorValue.swift in Sources */,
+				058B8EB52994386700263FE9 /* ArrayIsEmpty.swift in Sources */,
+				058B8EB82994386700263FE9 /* SensorItem.swift in Sources */,
+				058B8EB32994386700263FE9 /* SensorGraphView.swift in Sources */,
+				058B8EB42994386700263FE9 /* SensorsWindowController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		05646BF82685072900707676 /* SensorsWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				05646BF92685072900707676 /* Base */,
+			);
+			name = SensorsWindowController.xib;
+			sourceTree = "<group>";
+		};
+		05E0C31D268635F200D1D216 /* SensorItem.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				05E0C31E268635F200D1D216 /* Base */,
+			);
+			name = SensorItem.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		05646BA6268501B400707676 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05646BE6268503D300707676 /* Debug - Library.xcconfig */;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		05646BA7268501B400707676 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05646BBE268503D300707676 /* Release - Library.xcconfig */;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		058B8EAA2994383300263FE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 XS-Labs. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xs-labs.SensorsUI";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		058B8EAB2994383300263FE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 XS-Labs. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xs-labs.SensorsUI";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		05646B95268501B300707676 /* Build configuration list for PBXProject "SensorsUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05646BA6268501B400707676 /* Debug */,
+				05646BA7268501B400707676 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		058B8EAF2994383300263FE9 /* Build configuration list for PBXNativeTarget "SensorsUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				058B8EAA2994383300263FE9 /* Debug */,
+				058B8EAB2994383300263FE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 05646B92268501B300707676 /* Project object */;
+}
