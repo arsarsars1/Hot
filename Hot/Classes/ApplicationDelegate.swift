@@ -26,6 +26,7 @@ import Cocoa
 import GitHubUpdates
 import SensorsUI
 
+
 @NSApplicationMain
 class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 {
@@ -120,6 +121,10 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
                 self.detachGraph( nil )
             }
         }
+
+        
+
+
     }
 
     func applicationWillTerminate( _ notification: Notification )
