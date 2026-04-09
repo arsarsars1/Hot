@@ -26,6 +26,10 @@ xcuserdata
 # Build Directories
 build/
 DerivedData/
+
+# Packaged app / archives (do not commit)
+Hot.app/
+*.zip
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint

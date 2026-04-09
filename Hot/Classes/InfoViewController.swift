@@ -63,38 +63,6 @@ public class InfoViewController: NSViewController
         "InfoViewController"
     }
 
-    @IBOutlet private var fanModeDropdown: NSButton!
-
-    @IBAction private func changeFanMode( _ sender: NSButton )
-    {
-        let isManual = sender.state == .on
-        let key      = "F0Md" // Assumes Fan 0 for the main info view
-        
-        // Debug print
-        print( "HOT_DEBUG: InfoView changeFanMode - Key: \(key), Manual: \(isManual)" )
-        
-        // Similar to FanViewController logic
-        var byteVal = UInt8( isManual ? 1 : 0 )
-        let data    = Data( bytes: &byteVal, count: 1 )
-        
-        guard let keyCode = key.cString( using: .ascii )
-        else
-        {
-            return
-        }
-        
-        var k: UInt32 = 0
-        if keyCode.count == 5
-        {
-            k = UInt32( keyCode[ 0 ] ) << 24
-              | UInt32( keyCode[ 1 ] ) << 16
-              | UInt32( keyCode[ 2 ] ) <<  8
-              | UInt32( keyCode[ 3 ] ) <<  0
-        }
-        
-        let result = SMCKit.SMC.shared.writeKey( k, data: data )
-        print( "HOT_DEBUG: InfoView writeSMC - Result: \(result)" )
-    }
 
 
     public override func viewDidLoad()
@@ -107,7 +75,6 @@ public class InfoViewController: NSViewController
         var frame = self.view.frame
         frame.size.width = 450
         self.view.frame = frame
-        print( "HOT_DEBUG: InfoView viewDidLoad - Frame width set to: \(self.view.frame.width)" )
 
         self.setTimer()
         self.log.refresh
@@ -148,9 +115,9 @@ public class InfoViewController: NSViewController
             }
         }
         
-        if maxSpeed > 1000 {
+        if maxSpeed > 1000
+        {
             self.maxFanSpeed = Int( maxSpeed )
-            print( "HOT_DEBUG: Detected Max Fan Speed: \(self.maxFanSpeed)" )
         }
     }
 
@@ -196,12 +163,6 @@ public class InfoViewController: NSViewController
     public override func viewDidLayout()
     {
         super.viewDidLayout()
-        
-        if let btn = self.fanModeDropdown
-        {
-            print( "HOT_DEBUG: viewDidLayout - Dropdown Frame: \(btn.frame), Superview Frame: \(btn.superview?.frame ?? .zero)" )
-            print( "HOT_DEBUG: viewDidLayout - Dropdown Hidden: \(btn.isHidden), Enabled: \(btn.isEnabled)" )
-        }
     }
 
     private func update()

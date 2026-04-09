@@ -288,16 +288,7 @@
                                     </textFieldCell>
                                 </textField>
 
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mtd-5C-kjs">
-                                    <rect key="frame" x="58" y="-7" width="120" height="25"/>
-                                    <buttonCell key="cell" type="check" title="Manual Control" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Mod-Cell">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="changeFanMode:" target="-2" id="Act-Mode"/>
-                                    </connections>
-                                </button>
+
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F01-KG-WAt">
                                     <rect key="frame" x="142" y="0.0" width="37" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="YN4-so-Lw0">
@@ -315,17 +306,13 @@
                                 </textField>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="centerY" secondItem="9xm-le-geD" secondAttribute="centerY" id="Label-Center-Container"/>
-                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="top" secondItem="9xm-le-geD" secondAttribute="top" id="Btn-Top"/>
-                                <constraint firstAttribute="bottom" secondItem="Mtd-5C-kjs" secondAttribute="bottom" id="Btn-Bottom"/>
-                                <constraint firstAttribute="trailing" secondItem="F01-KG-WAt" secondAttribute="trailing" id="I76-wh-p6x"/>
-                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="leading" secondItem="xOG-gg-jQ1" secondAttribute="trailing" constant="8" symbolic="YES" id="OeB-fM-N3o"/>
-                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="leading" secondItem="G1N-Jm-VAf" secondAttribute="trailing" constant="8" symbolic="YES" id="Dropdown-Lead"/>
-                                <constraint firstItem="Mtd-5C-kjs" firstAttribute="centerY" secondItem="G1N-Jm-VAf" secondAttribute="centerY" id="Dropdown-Center"/>
-                                <constraint firstItem="F01-KG-WAt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Mtd-5C-kjs" secondAttribute="trailing" constant="8" symbolic="YES" id="XZ5-eZ-ytO"/>
-                                <constraint firstItem="F01-KG-WAt" firstAttribute="centerY" secondItem="G1N-Jm-VAf" secondAttribute="centerY" id="rwZ-0D-WNj"/>
+                                <constraint firstItem="xOG-gg-jQ1" firstAttribute="top" secondItem="9xm-le-geD" secondAttribute="top" id="Fan-Icon-Top"/>
+                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="centerY" secondItem="xOG-gg-jQ1" secondAttribute="centerY" id="Fan-Label-CenterY-Icon"/>
+                                <constraint firstItem="F01-KG-WAt" firstAttribute="leading" secondItem="G1N-Jm-VAf" secondAttribute="trailing" constant="15" id="RPM-Leading"/>
+                                <constraint firstAttribute="bottom" secondItem="xOG-gg-jQ1" secondAttribute="bottom" id="Fan-Icon-Bottom"/>
                                 <constraint firstItem="xOG-gg-jQ1" firstAttribute="leading" secondItem="9xm-le-geD" secondAttribute="leading" id="vF2-il-Hsl"/>
-                                <constraint firstItem="xOG-gg-jQ1" firstAttribute="centerY" secondItem="9xm-le-geD" secondAttribute="centerY" id="Image-Center-Y"/>
+                                <constraint firstItem="F01-KG-WAt" firstAttribute="centerY" secondItem="G1N-Jm-VAf" secondAttribute="centerY" id="rwZ-0D-WNj"/>
+                                <constraint firstItem="G1N-Jm-VAf" firstAttribute="leading" secondItem="xOG-gg-jQ1" secondAttribute="trailing" constant="15" symbolic="YES" id="Fan-Label-Leading-Icon"/>
                             </constraints>
                         </customView>
                         <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Graph-Stack">
