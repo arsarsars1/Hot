@@ -38,6 +38,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
     private var sensorViewControllers:         [ SensorViewController  ] = []
     private var fanViewControllers:            [ FanViewController ] = []
     private var graphWindowController:         GraphWindowController?
+    private var updateCheckTimer:              Timer?
     private var exiting                      = false
 
     @IBOutlet private var menu:        NSMenu!
@@ -54,6 +55,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         UserDefaults.standard.removeObserver( self, forKeyPath: "colorizeStatusItemText" )
         UserDefaults.standard.removeObserver( self, forKeyPath: "convertToFahrenheit" )
         UserDefaults.standard.removeObserver( self, forKeyPath: "hideStatusIcon" )
+        UserDefaults.standard.removeObserver( self, forKeyPath: "fontName" )
     }
 
     func applicationDidFinishLaunching( _ notification: Notification )
@@ -99,14 +101,22 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         if UserDefaults.standard.bool( forKey: "automaticallyCheckForUpdates" )
         {
             DispatchQueue.main.asyncAfter( deadline: .now() + .seconds( 2 ) )
-            {
-                self.updater.checkForUpdatesInBackground()
+            { [ weak self ] in
+
+                self?.updater.checkForUpdatesInBackground()
             }
         }
 
-        Timer.scheduledTimer( withTimeInterval: 3600, repeats: true )
-        {
-            _ in
+        self.updateCheckTimer?.invalidate()
+
+        let updateTimer = Timer( timeInterval: 3600, repeats: true )
+        { [ weak self ] _ in
+
+            guard let self = self
+            else
+            {
+                return
+            }
 
             if UserDefaults.standard.bool( forKey: "automaticallyCheckForUpdates" )
             {
@@ -114,11 +124,16 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
             }
         }
 
+        RunLoop.main.add( updateTimer, forMode: .common )
+
+        self.updateCheckTimer = updateTimer
+
         if UserDefaults.standard.bool( forKey: "showGraphPanel" )
         {
             DispatchQueue.main.asyncAfter( deadline: .now() + .seconds( 1 ) )
-            {
-                self.detachGraph( nil )
+            { [ weak self ] in
+
+                self?.detachGraph( nil )
             }
         }
 
@@ -130,6 +145,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
     func applicationWillTerminate( _ notification: Notification )
     {
         self.exiting = true
+        self.updateCheckTimer?.invalidate()
+        self.updateCheckTimer = nil
     }
 
     private func initializePreferences()
@@ -388,7 +405,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 
         controllers.removeAll { item in sensors.contains { $0.key == item.name  } == false }
         items.removeAll       { item in sensors.contains { $0.key == item.title } == false }
-        fanItems.removeAll    { item in fans.contains { $0.key == item.title } == false }
+        fanControllers.removeAll { item in fans.contains { $0.key == item.name } == false }
+        fanItems.removeAll       { item in fans.contains { $0.key == item.title } == false }
 
         sensors.forEach
         {

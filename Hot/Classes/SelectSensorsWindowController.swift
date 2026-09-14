@@ -45,6 +45,21 @@ public class SelectSensorsWindowController: NSWindowController, NSTableViewDeleg
         nil
     }
 
+    deinit
+    {
+        if let observer = self.windowOpenObserver
+        {
+            NotificationCenter.default.removeObserver( observer )
+        }
+
+        if let observer = self.windowCloseObserver
+        {
+            NotificationCenter.default.removeObserver( observer )
+        }
+
+        self.updateTimer?.invalidate()
+    }
+
     public override var windowNibName: NSNib.Name?
     {
         "SelectSensorsWindowController"
@@ -163,11 +178,6 @@ public class SelectSensorsWindowController: NSWindowController, NSTableViewDeleg
             self.name        = name
             self.enabled     = enabled
             self.temperature = temperature
-        }
-
-        override func isEqual( to object: Any? ) -> Bool
-        {
-            self.isEqual( object )
         }
 
         override func isEqual( _ object: Any? ) -> Bool

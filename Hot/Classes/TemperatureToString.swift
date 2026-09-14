@@ -59,12 +59,14 @@ public class TemperatureToString: ValueTransformer
             return "--" as NSString
         }
 
-        if UserDefaults.standard.bool( forKey: "convertToFahrenheit" )
+        let fahrenheit = UserDefaults.standard.bool( forKey: "convertToFahrenheit" )
+
+        if fahrenheit
         {
             n = Int( Double( n ) * 1.8 + 32 )
         }
 
-        let unit = UserDefaults.standard.bool( forKey: "convertToFahrenheit" ) ? "F" : "C"
+        let unit = fahrenheit ? "F" : "C"
 
         return "\( n )°\( unit )" as NSString
     }

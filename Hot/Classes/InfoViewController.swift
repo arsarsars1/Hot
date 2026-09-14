@@ -55,6 +55,7 @@ public class InfoViewController: NSViewController
 
     deinit
     {
+        self.timer?.invalidate()
         UserDefaults.standard.removeObserver( self, forKeyPath: "refreshInterval" )
     }
 
@@ -78,10 +79,12 @@ public class InfoViewController: NSViewController
 
         self.setTimer()
         self.log.refresh
-        {
+        { [ weak self ] in
+
             DispatchQueue.main.async
-            {
-                self.update()
+            { [ weak self ] in
+
+                self?.update()
             }
         }
 
@@ -145,12 +148,21 @@ public class InfoViewController: NSViewController
         }
 
         let timer = Timer( timeInterval: Double( interval ), repeats: true )
-        {
-            _ in self.log.refresh
+        { [ weak self ] _ in
+
+            guard let self = self
+            else
             {
+                return
+            }
+
+            self.log.refresh
+            { [ weak self ] in
+
                 DispatchQueue.main.async
-                {
-                    self.update()
+                { [ weak self ] in
+
+                    self?.update()
                 }
             }
         }
