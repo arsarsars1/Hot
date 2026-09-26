@@ -143,6 +143,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 
         FanControlDiagnostics.leaveBreadcrumb( category: "lifecycle", message: "app_launch" )
         FanControlService.recoverIfNeeded()
+        FanControlService.restoreSavedConfigurationOnLaunchIfNeeded()
 
         let fanMenu = FanControlStatusMenuController()
         fanMenu.install(
@@ -172,6 +173,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 
     private func initializePreferences()
     {
+        FanControlDefaults.registerLifecycleDefaults()
+
         if UserDefaults.standard.object( forKey: "LastLaunch" ) == nil
         {
             UserDefaults.standard.setValue( true,     forKey: "automaticallyCheckForUpdates" )

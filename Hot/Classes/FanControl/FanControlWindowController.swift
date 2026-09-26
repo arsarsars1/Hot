@@ -335,7 +335,7 @@ final class FanControlPanelController: NSViewController
         self.actionButton.keyEquivalent = "\r"
         root.addArrangedSubview( self.actionButton )
 
-        let safetyFull = "Manual and curve modes require a privileged helper (Login Items). Control restores to system automatic if Hot quits, sleeps, or the helper loses its heartbeat. The helper uses the highest cooling level across all sensor curves."
+        let safetyFull = "Manual and curve modes require a privileged helper (Login Items). Control restores to System if Hot quits or the helper loses its heartbeat. After sleep, resume is optional in Preferences."
         let safety = NSTextField( wrappingLabelWithString: "Requires Login Items helper · restores to System if Hot quits." )
         safety.font = NSFont.systemFont( ofSize: 10 )
         safety.textColor = .tertiaryLabelColor

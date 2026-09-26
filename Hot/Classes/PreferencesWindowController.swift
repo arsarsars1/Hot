@@ -113,6 +113,24 @@ public class PreferencesWindowController: NSWindowController
         }
     }
 
+    @objc public dynamic var resumeFanControlAfterSleep: Bool =
+        UserDefaults.standard.object( forKey: FanControlDefaults.resumeAfterSleep ) as? Bool ?? true
+    {
+        didSet
+        {
+            UserDefaults.standard.set( self.resumeFanControlAfterSleep, forKey: FanControlDefaults.resumeAfterSleep )
+        }
+    }
+
+    @objc public dynamic var restoreFanControlOnLaunch =
+        UserDefaults.standard.bool( forKey: FanControlDefaults.restoreOnLaunch )
+    {
+        didSet
+        {
+            UserDefaults.standard.set( self.restoreFanControlOnLaunch, forKey: FanControlDefaults.restoreOnLaunch )
+        }
+    }
+
     @objc private dynamic var isAppleSilicon             = false
     @objc private dynamic var colorizeStatusItemTextLabel: String?
 

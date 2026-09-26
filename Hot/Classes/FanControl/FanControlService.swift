@@ -62,6 +62,8 @@ final class FanControlService: NSObject
     private var workingTimeout: DispatchWorkItem?
     private var pendingCompletions: [ UUID: ( FanControlResponse? ) -> Void ] = [:]
     private var loggedSigningMismatch = false
+    private var configurationToResume: FanControlConfiguration?
+    private var wakeResume: DispatchWorkItem?
 
     private override init()
     {
@@ -105,7 +107,42 @@ final class FanControlService: NSObject
             return
         }
 
+        // Quit / restart always hands fans back to System.
         shared.restoreAutomatic()
+    }
+
+    /// Optionally re-applies the user's saved Manual/Curve after launch (Preferences).
+    static func restoreSavedConfigurationOnLaunchIfNeeded()
+    {
+        guard FanControlDefaults.shouldRestoreOnLaunch
+        else
+        {
+            return
+        }
+
+        guard let configuration = Self.savedConfiguration()
+        else
+        {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter( deadline: .now() + 2.0 )
+        {
+            shared.refreshAccessState()
+
+            guard shared.accessState == .enabled
+            else
+            {
+                return
+            }
+
+            FanControlDiagnostics.leaveBreadcrumb(
+                category: "lifecycle",
+                message: "launch_restore",
+                data: [ "mode": configuration.mode.rawValue ]
+            )
+            shared.applyConfiguration( configuration )
+        }
     }
 
     func windowDidAppear()
@@ -230,6 +267,8 @@ final class FanControlService: NSObject
 
     func applyConfiguration( _ configuration: FanControlConfiguration )
     {
+        self.cancelWakeResume()
+
         guard FanControlPolicy.validConfiguration( configuration )
         else
         {
@@ -336,6 +375,8 @@ final class FanControlService: NSObject
 
     func restoreAutomatic()
     {
+        self.cancelWakeResume()
+
         guard self.accessState == .enabled || UserDefaults.standard.bool( forKey: FanControlDefaults.recoveryNeeded )
         else
         {
@@ -832,14 +873,114 @@ final class FanControlService: NSObject
             name: NSWorkspace.willSleepNotification,
             object: nil
         )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector( self.systemDidWake( _: ) ),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
     }
 
+    /// The helper stops receiving heartbeats while asleep, so control is handed
+    /// back to the SMC before sleep. Wake resume is optional (Preferences).
     @objc
     private func systemWillSleep( _ notification: Notification )
     {
-        if self.snapshot.isCooling || UserDefaults.standard.bool( forKey: FanControlDefaults.recoveryNeeded )
+        guard self.snapshot.isCooling || UserDefaults.standard.bool( forKey: FanControlDefaults.recoveryNeeded )
+        else
         {
-            self.restoreAutomatic()
+            return
+        }
+
+        let resume = self.snapshot.configuration ?? Self.savedConfiguration()
+        self.restoreAutomatic()
+
+        if FanControlDefaults.shouldResumeAfterSleep
+        {
+            self.configurationToResume = resume.flatMap { $0.mode == .system ? nil : $0 }
+        }
+        else
+        {
+            self.configurationToResume = nil
+        }
+
+        FanControlDiagnostics.leaveBreadcrumb(
+            category: "lifecycle",
+            message: "sleep_restore",
+            data: [ "resume": self.configurationToResume?.mode.rawValue ?? "none" ]
+        )
+    }
+
+    @objc
+    private func systemDidWake( _ notification: Notification )
+    {
+        guard self.configurationToResume != nil
+        else
+        {
+            return
+        }
+
+        self.wakeResume?.cancel()
+
+        let work = DispatchWorkItem
+        {
+            [ weak self ] in
+            guard let self = self, let configuration = self.configurationToResume
+            else
+            {
+                return
+            }
+
+            self.wakeResume = nil
+            self.configurationToResume = nil
+            self.refreshAccessState()
+
+            // Never prompt for authorization from a background wake.
+            guard self.accessState == .enabled
+            else
+            {
+                return
+            }
+
+            FanControlDiagnostics.leaveBreadcrumb(
+                category: "lifecycle",
+                message: "wake_resume",
+                data: [ "mode": configuration.mode.rawValue ]
+            )
+            self.applyConfiguration( configuration )
+        }
+        self.wakeResume = work
+        DispatchQueue.main.asyncAfter( deadline: .now() + 3.0, execute: work )
+    }
+
+    private func cancelWakeResume()
+    {
+        self.wakeResume?.cancel()
+        self.wakeResume = nil
+        self.configurationToResume = nil
+    }
+
+    private static func savedConfiguration() -> FanControlConfiguration?
+    {
+        let defaults = UserDefaults.standard
+
+        switch FanControlMode( rawValue: defaults.string( forKey: FanControlDefaults.mode ) ?? "" )
+        {
+            case .manual:
+                let level = defaults.integer( forKey: FanControlDefaults.coolingLevel )
+                return FanControlPolicy.validCoolingLevel( level ) ? .manual( level: level ) : nil
+
+            case .curve:
+                guard let raw = defaults.string( forKey: FanControlDefaults.curves ),
+                      let curves = FanControlConfiguration.decodeCurves( raw )
+                else
+                {
+                    return nil
+                }
+                return .curve( curves )
+
+            case .system, .none:
+                return nil
         }
     }
 

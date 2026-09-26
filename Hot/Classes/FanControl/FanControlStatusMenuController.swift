@@ -82,6 +82,7 @@ final class FanControlStatusMenuController: NSObject, NSMenuDelegate
     @objc
     private func selectSystem( _ sender: Any? )
     {
+        UserDefaults.standard.set( FanControlMode.system.rawValue, forKey: FanControlDefaults.mode )
         self.service.applyConfiguration(
             FanControlConfiguration( mode: .system, manualLevel: FanControlPolicy.defaultCoolingLevel, curves: [] )
         )

@@ -31,4 +31,33 @@ enum FanControlDefaults
     static let curves = "fanControlCurves"
     static let recoveryNeeded = "fanControlRecoveryNeeded"
     static let helperVersion = "fanControlHelperVersion"
+    /// Re-apply Manual/Curve after sleep/wake. Default: true.
+    static let resumeAfterSleep = "fanControlResumeAfterSleep"
+    /// Re-apply saved Manual/Curve when Hot launches. Default: false (quit always returns to System).
+    static let restoreOnLaunch = "fanControlRestoreOnLaunch"
+
+    static func registerLifecycleDefaults()
+    {
+        UserDefaults.standard.register(
+            defaults: [
+                resumeAfterSleep: true,
+                restoreOnLaunch: false,
+            ]
+        )
+    }
+
+    static var shouldResumeAfterSleep: Bool
+    {
+        if UserDefaults.standard.object( forKey: resumeAfterSleep ) == nil
+        {
+            return true
+        }
+
+        return UserDefaults.standard.bool( forKey: resumeAfterSleep )
+    }
+
+    static var shouldRestoreOnLaunch: Bool
+    {
+        UserDefaults.standard.bool( forKey: restoreOnLaunch )
+    }
 }
