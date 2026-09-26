@@ -38,6 +38,7 @@ public class InfoViewController: NSViewController
     @objc public private( set ) dynamic var thermalPressure: Int  = 0
     @objc public private( set ) dynamic var hasSensors:      Bool = false
     @objc public private( set ) dynamic var hasFans:         Bool = false
+    @objc public private( set ) dynamic var fanControlExpanded: Bool = false
 
     public var onUpdate: ( () -> Void )?
 
@@ -50,8 +51,18 @@ public class InfoViewController: NSViewController
     @IBOutlet public private( set ) var graphView:       GraphView?
     @IBOutlet public private( set ) var fanGraphView:    GraphView?
     @IBOutlet private               var graphViewHeight: NSLayoutConstraint!
-    
+    @IBOutlet private               var metricsStack:    NSStackView?
+    @IBOutlet private               var pressureRow:     NSView?
+    @IBOutlet private               var temperatureRow:  NSView?
+    @IBOutlet private               var fanRow:          NSView?
+
     private var maxFanSpeed: Int = 6000
+    private var fanControlPanel: FanControlPanelController?
+    private var sidebarContainer: NSView?
+    private var sidebarWidthConstraint: NSLayoutConstraint?
+    private var sidebarMinHeightConstraint: NSLayoutConstraint?
+    private var rootWidthConstraint: NSLayoutConstraint?
+    private var chevronLabel: NSTextField?
 
     deinit
     {
@@ -89,8 +100,200 @@ public class InfoViewController: NSViewController
         }
 
         UserDefaults.standard.addObserver( self, forKeyPath: "refreshInterval",  options: [], context: nil )
-        
-        self.detectMaxFanSpeed()
+
+        // Defer SMC reads so we do not race ThermalLog.refresh on launch.
+        DispatchQueue.global( qos: .utility ).async
+        {
+            [ weak self ] in
+            self?.detectMaxFanSpeed()
+        }
+
+        self.installFanControlSidebar()
+        self.installMetricRowClicks()
+    }
+
+    @objc
+    public func toggleFanControlSidebar( _ sender: Any? )
+    {
+        self.setFanControlExpanded( !self.fanControlExpanded, animated: true )
+    }
+
+    public func setFanControlExpanded( _ expanded: Bool, animated: Bool )
+    {
+        guard self.fanControlExpanded != expanded
+        else
+        {
+            return
+        }
+
+        self.fanControlExpanded = expanded
+        self.chevronLabel?.stringValue = expanded ? "▾" : "▸"
+        self.sidebarContainer?.isHidden = expanded == false
+        self.sidebarWidthConstraint?.constant = expanded ? 360 : 0
+        self.sidebarMinHeightConstraint?.isActive = expanded
+        self.rootWidthConstraint?.constant = expanded ? 820 : 450
+
+        if expanded
+        {
+            self.ensureFanControlPanelLoaded()
+            self.fanControlPanel?.prepareForSidebarDisplay()
+        }
+        else
+        {
+            self.fanControlPanel?.prepareForSidebarHide()
+        }
+
+        let apply =
+        {
+            self.view.layoutSubtreeIfNeeded()
+            if let menu = self.view.enclosingMenuItem?.menu
+            {
+                menu.itemChanged( self.view.enclosingMenuItem! )
+            }
+            var frame = self.view.frame
+            frame.size.width = expanded ? 820 : 450
+            self.view.frame = frame
+            self.view.needsLayout = true
+            self.view.window?.layoutIfNeeded()
+        }
+
+        if animated
+        {
+            NSAnimationContext.runAnimationGroup
+            {
+                context in
+                context.duration = 0.18
+                context.allowsImplicitAnimation = true
+                apply()
+            }
+        }
+        else
+        {
+            apply()
+        }
+    }
+
+    private func installFanControlSidebar()
+    {
+        guard let metricsStack = self.metricsStack,
+              let superview = metricsStack.superview
+        else
+        {
+            return
+        }
+
+        let shell = NSView()
+        shell.translatesAutoresizingMaskIntoConstraints = false
+        shell.wantsLayer = true
+        shell.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent( 0.55 ).cgColor
+        shell.layer?.cornerRadius = 10
+        shell.isHidden = true
+
+        let separator = NSView()
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        separator.wantsLayer = true
+        if #available( macOS 10.14, * )
+        {
+            separator.layer?.backgroundColor = NSColor.separatorColor.cgColor
+        }
+        else
+        {
+            separator.layer?.backgroundColor = NSColor( white: 0.75, alpha: 0.8 ).cgColor
+        }
+
+        // Detach from the XIB first, then wrap — never removeFromSuperview after
+        // NSStackView(views:) already adopted the metrics stack (that orphaned temps/graphs).
+        metricsStack.removeFromSuperview()
+
+        let horizontal = NSStackView()
+        horizontal.orientation = .horizontal
+        horizontal.alignment = .top
+        horizontal.spacing = 12
+        horizontal.translatesAutoresizingMaskIntoConstraints = false
+        horizontal.setHuggingPriority( .defaultHigh, for: .horizontal )
+        horizontal.addArrangedSubview( metricsStack )
+        horizontal.addArrangedSubview( separator )
+        horizontal.addArrangedSubview( shell )
+
+        superview.addSubview( horizontal )
+
+        let width = shell.widthAnchor.constraint( equalToConstant: 0 )
+        self.sidebarWidthConstraint = width
+        self.sidebarContainer = shell
+
+        let minHeight = shell.heightAnchor.constraint( greaterThanOrEqualToConstant: 420 )
+        minHeight.isActive = false
+        self.sidebarMinHeightConstraint = minHeight
+
+        let rootWidth = self.view.widthAnchor.constraint( equalToConstant: 450 )
+        rootWidth.priority = .required
+        self.rootWidthConstraint = rootWidth
+
+        NSLayoutConstraint.activate(
+            [
+                horizontal.leadingAnchor.constraint( equalTo: superview.leadingAnchor, constant: 20 ),
+                horizontal.trailingAnchor.constraint( equalTo: superview.trailingAnchor, constant: -20 ),
+                horizontal.topAnchor.constraint( equalTo: superview.topAnchor, constant: 5 ),
+                horizontal.bottomAnchor.constraint( equalTo: superview.bottomAnchor ),
+                separator.widthAnchor.constraint( equalToConstant: 1 ),
+                separator.heightAnchor.constraint( equalTo: metricsStack.heightAnchor ),
+                width,
+                rootWidth,
+            ]
+        )
+    }
+
+    private func ensureFanControlPanelLoaded()
+    {
+        guard self.fanControlPanel == nil, let shell = self.sidebarContainer
+        else
+        {
+            return
+        }
+
+        let panel = FanControlPanelController( compact: true )
+        self.fanControlPanel = panel
+        self.addChild( panel )
+
+        shell.addSubview( panel.view )
+        panel.view.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate(
+            [
+                panel.view.leadingAnchor.constraint( equalTo: shell.leadingAnchor ),
+                panel.view.trailingAnchor.constraint( equalTo: shell.trailingAnchor ),
+                panel.view.topAnchor.constraint( equalTo: shell.topAnchor ),
+                panel.view.bottomAnchor.constraint( equalTo: shell.bottomAnchor ),
+            ]
+        )
+    }
+
+    private func installMetricRowClicks()
+    {
+        let rows = [ self.pressureRow, self.temperatureRow, self.fanRow ].compactMap { $0 }
+
+        for row in rows
+        {
+            let click = NSClickGestureRecognizer( target: self, action: #selector( self.toggleFanControlSidebar( _: ) ) )
+            row.addGestureRecognizer( click )
+            row.toolTip = "Show Fan Control sidebar"
+        }
+
+        if let fanRow = self.fanRow
+        {
+            let chevron = NSTextField( labelWithString: "▸" )
+            chevron.font = NSFont.systemFont( ofSize: 11, weight: .semibold )
+            chevron.textColor = .tertiaryLabelColor
+            chevron.translatesAutoresizingMaskIntoConstraints = false
+            fanRow.addSubview( chevron )
+            NSLayoutConstraint.activate(
+                [
+                    chevron.trailingAnchor.constraint( equalTo: fanRow.trailingAnchor ),
+                    chevron.centerYAnchor.constraint( equalTo: fanRow.centerYAnchor ),
+                ]
+            )
+            self.chevronLabel = chevron
+        }
     }
     
     private func detectMaxFanSpeed()
@@ -120,7 +323,10 @@ public class InfoViewController: NSViewController
         
         if maxSpeed > 1000
         {
-            self.maxFanSpeed = Int( maxSpeed )
+            DispatchQueue.main.async
+            {
+                self.maxFanSpeed = Int( maxSpeed )
+            }
         }
     }
 

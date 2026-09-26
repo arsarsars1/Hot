@@ -95,105 +95,117 @@ NS_ASSUME_NONNULL_END
 }
 
 - (NSArray<SMCData *> *)readAllKeys:(BOOL (^_Nullable)(uint32_t))filter {
-  if (self.connection == IO_OBJECT_NULL) {
-    return @[];
-  }
+  // Hot calls this from the main thread (fan UI) and ThermalLog's
+  // background queue concurrently. Synchronize mutation of `keys` /
+  // `keyInfoCache` and AppleSMC IOConnect use to avoid
+  // NSGenericException (collection mutated while being enumerated).
+  @synchronized(self) {
+    if (self.connection == IO_OBJECT_NULL) {
+      return @[];
+    }
 
-  if (self.keys.count == 0) {
-    uint32_t count = [self readSMCKeyCount];
+    if (self.keys.count == 0) {
+      uint32_t count = [self readSMCKeyCount];
 
-    for (uint32_t i = 0; i < count; i++) {
-      uint32_t key = 0;
+      for (uint32_t i = 0; i < count; i++) {
+        uint32_t key = 0;
 
-      if ([self readSMCKey:&key atIndex:i] == NO) {
+        if ([self readSMCKey:&key atIndex:i] == NO) {
+          continue;
+        }
+
+        if (key != 0) {
+          [self.keys addObject:[NSNumber numberWithUnsignedInt:key]];
+        }
+      }
+    }
+
+    NSMutableArray<SMCData *> *items =
+        [[NSMutableArray alloc] initWithCapacity:self.keys.count];
+
+    for (NSNumber *key in self.keys) {
+      if (filter != nil && filter(key.unsignedIntValue) == NO) {
         continue;
       }
 
-      if (key != 0) {
-        [self.keys addObject:[NSNumber numberWithUnsignedInt:key]];
+      SMCKeyInfoData info;
+      uint8_t data[32];
+      uint32_t size = sizeof(data);
+
+      if ([self readSMCKey:key.unsignedIntValue
+                    buffer:data
+                   maxSize:&size
+                   keyInfo:&info] == NO) {
+        continue;
       }
+
+      SMCData *item =
+          [[SMCData alloc] initWithKey:key.unsignedIntValue
+                                  type:info.dataType
+                                  data:[NSData dataWithBytes:data length:size]];
+
+      [items addObject:item];
     }
+
+    return items;
   }
-
-  NSMutableArray<SMCData *> *items =
-      [[NSMutableArray alloc] initWithCapacity:self.keys.count];
-
-  for (NSNumber *key in self.keys) {
-    if (filter != nil && filter(key.unsignedIntValue) == NO) {
-      continue;
-    }
-
-    SMCKeyInfoData info;
-    uint8_t data[32];
-    uint32_t size = sizeof(data);
-
-    if ([self readSMCKey:key.unsignedIntValue
-                  buffer:data
-                 maxSize:&size
-                 keyInfo:&info] == NO) {
-      continue;
-    }
-
-    SMCData *item = [[SMCData alloc] initWithKey:key.unsignedIntValue
-                                            type:info.dataType
-                                            data:[NSData dataWithBytes:data
-                                                                length:size]];
-
-    [items addObject:item];
-  }
-
-  return items;
 }
 
 - (BOOL)open:(NSError *_Nullable __autoreleasing *)error {
-  if (self.connection != IO_OBJECT_NULL) {
+  @synchronized(self) {
+    if (self.connection != IO_OBJECT_NULL) {
+      return YES;
+    }
+
+    io_service_t smc = IOServiceGetMatchingService(
+        kIOMasterPortDefault, IOServiceMatching("AppleSMC"));
+
+    if (smc == IO_OBJECT_NULL) {
+      if (error) {
+        *(error) =
+            [SMCHelper errorWithTitle:@"Cannot Open SMC"
+                              message:@"Unable to retrieve the SMC service."
+                                 code:-1];
+      }
+
+      return NO;
+    }
+
+    io_connect_t connection = IO_OBJECT_NULL;
+    kern_return_t result =
+        IOServiceOpen(smc, mach_task_self(), 0, &connection);
+
+    if (result != kIOReturnSuccess || connection == IO_OBJECT_NULL) {
+      if (error) {
+        *(error) =
+            [SMCHelper errorWithTitle:@"Cannot Open SMC"
+                              message:@"Unable to open the SMC service."
+                                 code:-1];
+      }
+
+      return NO;
+    }
+
+    self.connection = connection;
+
     return YES;
   }
-
-  io_service_t smc = IOServiceGetMatchingService(kIOMasterPortDefault,
-                                                 IOServiceMatching("AppleSMC"));
-
-  if (smc == IO_OBJECT_NULL) {
-    if (error) {
-      *(error) =
-          [SMCHelper errorWithTitle:@"Cannot Open SMC"
-                            message:@"Unable to retrieve the SMC service."
-                               code:-1];
-    }
-
-    return NO;
-  }
-
-  io_connect_t connection = IO_OBJECT_NULL;
-  kern_return_t result = IOServiceOpen(smc, mach_task_self(), 0, &connection);
-
-  if (result != kIOReturnSuccess || connection == IO_OBJECT_NULL) {
-    if (error) {
-      *(error) = [SMCHelper errorWithTitle:@"Cannot Open SMC"
-                                   message:@"Unable to open the SMC service."
-                                      code:-1];
-    }
-
-    return NO;
-  }
-
-  self.connection = connection;
-
-  return YES;
 }
 
 - (BOOL)close {
-  if (self.connection == IO_OBJECT_NULL) {
+  @synchronized(self) {
+    if (self.connection == IO_OBJECT_NULL) {
+      return YES;
+    }
+
+    if (IOServiceClose(self.connection) != kIOReturnSuccess) {
+      return false;
+    }
+
+    self.connection = IO_OBJECT_NULL;
+
     return YES;
   }
-
-  if (IOServiceClose(self.connection) != kIOReturnSuccess) {
-    return false;
-  }
-
-  self.connection = IO_OBJECT_NULL;
-
-  return YES;
 }
 
 - (BOOL)callSMCFunction:(uint32_t)function
@@ -379,40 +391,43 @@ NS_ASSUME_NONNULL_END
 }
 
 - (BOOL)writeSMCKey:(uint32_t)key data:(NSData *)data {
-  if (key == 0 || data.length == 0) {
-    return NO;
+  @synchronized(self) {
+    if (key == 0 || data.length == 0) {
+      return NO;
+    }
+
+    SMCKeyInfoData info;
+
+    if ([self readSMCKeyInfo:&info forKey:key] == NO) {
+      return NO;
+    }
+
+    if (data.length != info.dataSize) {
+      return NO;
+    }
+
+    SMCParamStruct input;
+    SMCParamStruct output;
+
+    bzero(&input, sizeof(SMCParamStruct));
+    bzero(&output, sizeof(SMCParamStruct));
+
+    input.key = key;
+    input.data8 = kSMCWriteKey;
+    input.keyInfo.dataSize = info.dataSize;
+
+    for (uint32_t i = 0; i < info.dataSize; i++) {
+      input.bytes[i] = ((const uint8_t *)data.bytes)[i];
+    }
+
+    if ([self callSMCFunction:kSMCHandleYPCEvent
+                        input:&input
+                       output:&output] == NO) {
+      return NO;
+    }
+
+    return output.result == kSMCSuccess;
   }
-
-  SMCKeyInfoData info;
-
-  if ([self readSMCKeyInfo:&info forKey:key] == NO) {
-    return NO;
-  }
-
-  if (data.length != info.dataSize) {
-    return NO;
-  }
-
-  SMCParamStruct input;
-  SMCParamStruct output;
-
-  bzero(&input, sizeof(SMCParamStruct));
-  bzero(&output, sizeof(SMCParamStruct));
-
-  input.key = key;
-  input.data8 = kSMCWriteKey;
-  input.keyInfo.dataSize = info.dataSize;
-
-  for (uint32_t i = 0; i < info.dataSize; i++) {
-    input.bytes[i] = ((const uint8_t *)data.bytes)[i];
-  }
-
-  if ([self callSMCFunction:kSMCHandleYPCEvent input:&input
-                     output:&output] == NO) {
-    return NO;
-  }
-
-  return output.result == kSMCSuccess;
 }
 
 @end

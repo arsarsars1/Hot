@@ -14,6 +14,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="ApplicationDelegate" customModule="Hot" customModuleProvider="target">
             <connections>
+                <outlet property="fanControlMenu" destination="Fc3-Hot-Sub" id="Fc4-Hot-Out"/>
                 <outlet property="fansMenu" destination="4Ys-M6-kdZ" id="RbZ-ys-yZz"/>
                 <outlet property="menu" destination="YdR-H7-b4a" id="jeu-CN-jol"/>
                 <outlet property="sensorsMenu" destination="ub7-du-ljd" id="LPJ-gc-4R1"/>
@@ -740,6 +741,43 @@
                     <connections>
                         <action selector="detachGraph:" target="Voe-Tx-rLC" id="Tqg-wQ-nfG"/>
                     </connections>
+                </menuItem>
+                <menuItem title="Fan Control" id="Fc1-Hot-Ctrl">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Fan Control" id="Fc3-Hot-Sub">
+                        <items>
+                            <menuItem title="System" id="Fc5-Hot-Sys">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Manual" id="Fc6-Hot-Man">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Manual" id="Fc7-Hot-ManSub">
+                                    <items>
+                                        <menuItem title="50%" id="Fc8-Hot-Man50">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Curve" id="Fc9-Hot-Crv">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Curve" id="Fca-Hot-CrvSub">
+                                    <items>
+                                        <menuItem title="Apply Saved Curve" id="Fcb-Hot-CrvApply">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Fcc-Hot-Sep"/>
+                            <menuItem title="Fan Control Window..." id="Fcd-Hot-Win">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showFanControlWindow:" target="Voe-Tx-rLC" id="Fc2-Hot-Act"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="Nbp-cG-gpV"/>
                 <menuItem title="Preferences..." keyEquivalent="," id="JFH-mp-6PU">

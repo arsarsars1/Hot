@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		468DFCFE5D8B41E9AB2F2229 /* FanControlModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93CBA0D013242C2B992F251 /* FanControlModels.swift */; };
+		3657D363F23648168258CC9A /* FanControlDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94241FB0CD04B03A5117C1B /* FanControlDefaults.swift */; };
+		25275210908F428FABC69B09 /* FanControlXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E030EC0EF44273BBE0143C /* FanControlXPC.swift */; };
+		0F67054A752D49839D075051 /* SMCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F2C18CA8D245D1877DC398 /* SMCClient.swift */; };
+		04D8E22C1F0C4B95974FACEC /* TemperatureSensorKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A5DB98F4B6422A9ACF1294 /* TemperatureSensorKeys.swift */; };
+		C2630BEA88054F6D8FA451C7 /* FanControlHardware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6CF34F6FBF42AEB023EA80 /* FanControlHardware.swift */; };
+		CCF376D7CFC842ACA5AC7511 /* FanControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09524E046A794573B14FCB99 /* FanControlService.swift */; };
+		08A1B2C3D4E5F60718293A4B /* FanControlStatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A1B2C3D4E5F60718293A4C /* FanControlStatusMenuController.swift */; };
+		A7E4C1B92F1A4D8E9C0B2D3F /* FanControlDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D5E2A01C3F4A6B9E7D8C4A /* FanControlDiagnostics.swift */; };
+		2086A36ACC894627BFDF98EA /* FanControlWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */; };
 		05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E8526700772007246FF /* DictionaryIsEmpty.swift */; };
 		05221E88267009A8007246FF /* SensorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E87267009A8007246FF /* SensorViewController.swift */; };
 		05221E8B26700A57007246FF /* SensorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05221E8926700A57007246FF /* SensorViewController.xib */; };
@@ -105,6 +115,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B93CBA0D013242C2B992F251 /* FanControlModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlModels.swift; sourceTree = "<group>"; };
+		C94241FB0CD04B03A5117C1B /* FanControlDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlDefaults.swift; sourceTree = "<group>"; };
+		91E030EC0EF44273BBE0143C /* FanControlXPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlXPC.swift; sourceTree = "<group>"; };
+		39F2C18CA8D245D1877DC398 /* SMCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCClient.swift; sourceTree = "<group>"; };
+		69A5DB98F4B6422A9ACF1294 /* TemperatureSensorKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureSensorKeys.swift; sourceTree = "<group>"; };
+		1E6CF34F6FBF42AEB023EA80 /* FanControlHardware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlHardware.swift; sourceTree = "<group>"; };
+		09524E046A794573B14FCB99 /* FanControlService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlService.swift; sourceTree = "<group>"; };
+		08A1B2C3D4E5F60718293A4C /* FanControlStatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlStatusMenuController.swift; sourceTree = "<group>"; };
+		B8D5E2A01C3F4A6B9E7D8C4A /* FanControlDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlDiagnostics.swift; sourceTree = "<group>"; };
+		E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlWindowController.swift; sourceTree = "<group>"; };
 		05221E8526700772007246FF /* DictionaryIsEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryIsEmpty.swift; sourceTree = "<group>"; };
 		05221E87267009A8007246FF /* SensorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorViewController.swift; sourceTree = "<group>"; };
 		05221E8A26700A57007246FF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SensorViewController.xib; sourceTree = "<group>"; };
@@ -219,6 +239,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		76E02470D9984EE7BB817B88 /* FanControl */ = {
+			isa = PBXGroup;
+			children = (
+				B93CBA0D013242C2B992F251 /* FanControlModels.swift */,
+				C94241FB0CD04B03A5117C1B /* FanControlDefaults.swift */,
+				91E030EC0EF44273BBE0143C /* FanControlXPC.swift */,
+				39F2C18CA8D245D1877DC398 /* SMCClient.swift */,
+				69A5DB98F4B6422A9ACF1294 /* TemperatureSensorKeys.swift */,
+				1E6CF34F6FBF42AEB023EA80 /* FanControlHardware.swift */,
+				09524E046A794573B14FCB99 /* FanControlService.swift */,
+				B8D5E2A01C3F4A6B9E7D8C4A /* FanControlDiagnostics.swift */,
+				08A1B2C3D4E5F60718293A4C /* FanControlStatusMenuController.swift */,
+				E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */,
+			);
+			path = FanControl;
+			sourceTree = "<group>";
+		};
 		057F8AFE251D22360048F1E1 /* Images */ = {
 			isa = PBXGroup;
 			children = (
@@ -424,6 +461,7 @@
 				05AA4079251CF3D200106CEA /* ApplicationDelegate.swift */,
 				05221E87267009A8007246FF /* SensorViewController.swift */,
 				388C8F762C5523260057EA05 /* FanViewController.swift */,
+				76E02470D9984EE7BB817B88 /* FanControl */,
 				055A932A252780FD0070F771 /* GraphView.swift */,
 				057F8B0E251D274C0048F1E1 /* Hot-Bridging-Header.h */,
 				055A931F252778C10070F771 /* InfoViewController.swift */,
@@ -471,6 +509,7 @@
 				057F8B69251D2E560048F1E1 /* ShellScript */,
 				05AA4074251CF3D200106CEA /* Resources */,
 				057F8B66251D2D620048F1E1 /* CopyFiles */,
+				CF70236782B04257A84ACAC3 /* Embed Fan Control Helper */,
 			);
 			buildRules = (
 			);
@@ -582,6 +621,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		CF70236782B04257A84ACAC3 /* Embed Fan Control Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Fan Control Helper";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Scripts/embed-fan-control-helper.sh\"\n";
+		};
 		057F8B69251D2E560048F1E1 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -609,6 +666,16 @@
 			files = (
 				055A932525277E9E0070F771 /* IntegerToString.swift in Sources */,
 				388C8F772C5523260057EA05 /* FanViewController.swift in Sources */,
+				468DFCFE5D8B41E9AB2F2229 /* FanControlModels.swift in Sources */,
+				3657D363F23648168258CC9A /* FanControlDefaults.swift in Sources */,
+				25275210908F428FABC69B09 /* FanControlXPC.swift in Sources */,
+				0F67054A752D49839D075051 /* SMCClient.swift in Sources */,
+				04D8E22C1F0C4B95974FACEC /* TemperatureSensorKeys.swift in Sources */,
+				C2630BEA88054F6D8FA451C7 /* FanControlHardware.swift in Sources */,
+				CCF376D7CFC842ACA5AC7511 /* FanControlService.swift in Sources */,
+				A7E4C1B92F1A4D8E9C0B2D3F /* FanControlDiagnostics.swift in Sources */,
+				08A1B2C3D4E5F60718293A4B /* FanControlStatusMenuController.swift in Sources */,
+				2086A36ACC894627BFDF98EA /* FanControlWindowController.swift in Sources */,
 				382CF88F2C4FF77400D9DB3C /* FanSpeedToString.swift in Sources */,
 				055A932725277F6E0070F771 /* TemperatureToString.swift in Sources */,
 				05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */,

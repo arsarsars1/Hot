@@ -38,13 +38,17 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
     private var sensorViewControllers:         [ SensorViewController  ] = []
     private var fanViewControllers:            [ FanViewController ] = []
     private var graphWindowController:         GraphWindowController?
+    private var fanControlWindowController:    FanControlWindowController?
     private var updateCheckTimer:              Timer?
     private var exiting                      = false
 
-    @IBOutlet private var menu:        NSMenu!
-    @IBOutlet private var sensorsMenu: NSMenu!
-    @IBOutlet private var fansMenu:    NSMenu!
-    @IBOutlet private var updater:     GitHubUpdater!
+    @IBOutlet private var menu:           NSMenu!
+    @IBOutlet private var sensorsMenu:    NSMenu!
+    @IBOutlet private var fansMenu:       NSMenu!
+    @IBOutlet private var fanControlMenu: NSMenu!
+    @IBOutlet private var updater:        GitHubUpdater!
+
+    private var fanControlStatusMenu: FanControlStatusMenuController?
 
     @objc public private( set ) dynamic var infoViewController: InfoViewController?
 
@@ -137,9 +141,25 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
             }
         }
 
-        
+        FanControlDiagnostics.leaveBreadcrumb( category: "lifecycle", message: "app_launch" )
+        FanControlService.recoverIfNeeded()
 
+        let fanMenu = FanControlStatusMenuController()
+        fanMenu.install(
+            into: self.fanControlMenu,
+            windowTarget: self,
+            windowAction: #selector( showFanControlWindow( _: ) )
+        )
+        self.fanControlStatusMenu = fanMenu
 
+        if CommandLine.arguments.contains( "--open-fan-control" )
+        {
+            DispatchQueue.main.asyncAfter( deadline: .now() + .milliseconds( 800 ) )
+            {
+                [ weak self ] in
+                self?.showFanControlWindow( nil )
+            }
+        }
     }
 
     func applicationWillTerminate( _ notification: Notification )
@@ -147,6 +167,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         self.exiting = true
         self.updateCheckTimer?.invalidate()
         self.updateCheckTimer = nil
+        FanControlService.restoreBeforeTerminationIfNeeded()
     }
 
     private func initializePreferences()
@@ -277,6 +298,30 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 
         NSApp.activate( ignoringOtherApps: true )
         window.makeKeyAndOrderFront( nil )
+    }
+
+    @IBAction
+    public func showFanControlWindow( _ sender: Any? )
+    {
+        if self.fanControlWindowController == nil
+        {
+            self.fanControlWindowController = FanControlWindowController()
+        }
+
+        guard let window = self.fanControlWindowController?.window
+        else
+        {
+            NSSound.beep()
+            return
+        }
+
+        // Menu-bar apps stay accessory; order front after activation so the
+        // Fan Control panel is visible when opened from the status menu.
+        NSApp.activate( ignoringOtherApps: true )
+        self.fanControlWindowController?.showWindow( sender )
+        window.collectionBehavior.insert( .moveToActiveSpace )
+        window.makeKeyAndOrderFront( nil )
+        window.orderFrontRegardless()
     }
 
     @IBAction

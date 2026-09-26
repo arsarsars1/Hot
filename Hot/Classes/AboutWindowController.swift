@@ -81,7 +81,7 @@ public class AboutWindowController: NSWindowController
     private static var appleSiliconAboutBody: String
     {
         """
-        Apple Silicon (M‑series): Hot shows thermal pressure, temperature, and fan speed for monitoring. macOS controls cooling automatically — this app does not change fan speeds, so you get stable readouts instead of experimental controls that may not work on your Mac or could confuse the system.
+        Apple Silicon (M‑series): Hot shows thermal pressure, temperature, and fan speed. Optional Fan Control (System / Manual / Curve) uses a privileged helper you approve in Login Items; without it, Hot only monitors. Always restore System control when finished.
         """
     }
 

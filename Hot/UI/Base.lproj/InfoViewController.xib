@@ -9,8 +9,12 @@
         <customObject id="-2" userLabel="File's Owner" customClass="InfoViewController" customModule="Hot" customModuleProvider="target">
             <connections>
                 <outlet property="fanGraphView" destination="Fan-Graph" id="Fan-Gr-Conn"/>
+                <outlet property="fanRow" destination="9xm-le-geD" id="Fan-Row-Out"/>
                 <outlet property="graphView" destination="fKC-eM-8Gr" id="GqG-t8-Mqb"/>
                 <outlet property="graphViewHeight" destination="GStack-Height" id="Trb-lr-WNa"/>
+                <outlet property="metricsStack" destination="9GX-0h-uwG" id="Met-St-Out"/>
+                <outlet property="pressureRow" destination="EZc-c0-cip" id="Prs-Row-Out"/>
+                <outlet property="temperatureRow" destination="9NI-ca-EZ2" id="Tmp-Row-Out"/>
                 <outlet property="view" destination="c22-O7-iKe" id="cLu-Fu-Lbr"/>
             </connections>
         </customObject>
