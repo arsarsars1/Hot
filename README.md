@@ -27,6 +27,10 @@ A graph view for all sensors may also be displayed on Apple Silicon.
 ![Apple Silicon Menu](Assets/menu-arm.png "Apple Silicon Menu")
 ![Sensors](Assets/sensors.png "Sensors")
 
+#### Memory Boost
+
+From the status menu, **Memory Boost…** opens a sidebar (same shell as Fan Control — opening one collapses the other) that lists user GUI apps sorted by resident memory. **Quit** terminates an app; Option-click Force Quits. The panel also includes **Stop all listeners** for leftover TCP listeners on common DevGuard-style ports (`3000–3002`, `5173–5176`, `5199`). System-protected processes and Hot itself are never listed as killable.
+
 License
 -------
 

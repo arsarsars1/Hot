@@ -39,6 +39,7 @@ public class InfoViewController: NSViewController
     @objc public private( set ) dynamic var hasSensors:      Bool = false
     @objc public private( set ) dynamic var hasFans:         Bool = false
     @objc public private( set ) dynamic var fanControlExpanded: Bool = false
+    @objc public private( set ) dynamic var memoryBoostExpanded: Bool = false
 
     public var onUpdate: ( () -> Void )?
 
@@ -56,8 +57,17 @@ public class InfoViewController: NSViewController
     @IBOutlet private               var temperatureRow:  NSView?
     @IBOutlet private               var fanRow:          NSView?
 
+    private enum SidebarMode
+    {
+        case none
+        case fanControl
+        case memoryBoost
+    }
+
     private var maxFanSpeed: Int = 6000
+    private var sidebarMode: SidebarMode = .none
     private var fanControlPanel: FanControlPanelController?
+    private var memoryBoostPanel: MemoryBoostPanelController?
     private var sidebarContainer: NSView?
     private var sidebarWidthConstraint: NSLayoutConstraint?
     private var sidebarMinHeightConstraint: NSLayoutConstraint?
@@ -120,27 +130,65 @@ public class InfoViewController: NSViewController
 
     public func setFanControlExpanded( _ expanded: Bool, animated: Bool )
     {
-        guard self.fanControlExpanded != expanded
+        self.setSidebarMode( expanded ? .fanControl : .none, animated: animated )
+    }
+
+    public func setMemoryBoostExpanded( _ expanded: Bool, animated: Bool )
+    {
+        self.setSidebarMode( expanded ? .memoryBoost : .none, animated: animated )
+    }
+
+    private func setSidebarMode( _ mode: SidebarMode, animated: Bool )
+    {
+        guard self.sidebarMode != mode
         else
         {
             return
         }
 
-        self.fanControlExpanded = expanded
-        self.chevronLabel?.stringValue = expanded ? "▾" : "▸"
+        let previous = self.sidebarMode
+        self.sidebarMode = mode
+        self.fanControlExpanded = mode == .fanControl
+        self.memoryBoostExpanded = mode == .memoryBoost
+
+        let expanded = mode != .none
+        self.chevronLabel?.stringValue = self.fanControlExpanded ? "▾" : "▸"
         self.sidebarContainer?.isHidden = expanded == false
         self.sidebarWidthConstraint?.constant = expanded ? 360 : 0
         self.sidebarMinHeightConstraint?.isActive = expanded
         self.rootWidthConstraint?.constant = expanded ? 820 : 450
 
-        if expanded
+        switch previous
         {
-            self.ensureFanControlPanelLoaded()
-            self.fanControlPanel?.prepareForSidebarDisplay()
+            case .fanControl:
+                self.fanControlPanel?.prepareForSidebarHide()
+                self.fanControlPanel?.view.isHidden = true
+
+            case .memoryBoost:
+                self.memoryBoostPanel?.prepareForSidebarHide()
+                self.memoryBoostPanel?.view.isHidden = true
+
+            case .none:
+                break
         }
-        else
+
+        switch mode
         {
-            self.fanControlPanel?.prepareForSidebarHide()
+            case .fanControl:
+                self.ensureFanControlPanelLoaded()
+                self.fanControlPanel?.view.isHidden = false
+                self.memoryBoostPanel?.view.isHidden = true
+                self.fanControlPanel?.prepareForSidebarDisplay()
+
+            case .memoryBoost:
+                self.ensureMemoryBoostPanelLoaded()
+                self.memoryBoostPanel?.view.isHidden = false
+                self.fanControlPanel?.view.isHidden = true
+                self.memoryBoostPanel?.prepareForSidebarDisplay()
+
+            case .none:
+                self.fanControlPanel?.view.isHidden = true
+                self.memoryBoostPanel?.view.isHidden = true
         }
 
         let apply =
@@ -254,16 +302,34 @@ public class InfoViewController: NSViewController
         let panel = FanControlPanelController( compact: true )
         self.fanControlPanel = panel
         self.addChild( panel )
+        self.pinPanel( panel.view, in: shell )
+    }
 
-        shell.addSubview( panel.view )
-        panel.view.translatesAutoresizingMaskIntoConstraints = false
+    private func ensureMemoryBoostPanelLoaded()
+    {
+        guard self.memoryBoostPanel == nil, let shell = self.sidebarContainer
+        else
+        {
+            return
+        }
+
+        let panel = MemoryBoostPanelController()
+        self.memoryBoostPanel = panel
+        self.addChild( panel )
+        self.pinPanel( panel.view, in: shell )
+    }
+
+    private func pinPanel( _ panelView: NSView, in shell: NSView )
+    {
+        shell.addSubview( panelView )
+        panelView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate(
             [
-                panel.view.leadingAnchor.constraint( equalTo: shell.leadingAnchor ),
-                panel.view.trailingAnchor.constraint( equalTo: shell.trailingAnchor ),
-                panel.view.topAnchor.constraint( equalTo: shell.topAnchor ),
-                panel.view.bottomAnchor.constraint( equalTo: shell.bottomAnchor ),
+                panelView.leadingAnchor.constraint( equalTo: shell.leadingAnchor ),
+                panelView.trailingAnchor.constraint( equalTo: shell.trailingAnchor ),
+                panelView.topAnchor.constraint( equalTo: shell.topAnchor ),
+                panelView.bottomAnchor.constraint( equalTo: shell.bottomAnchor ),
             ]
         )
     }

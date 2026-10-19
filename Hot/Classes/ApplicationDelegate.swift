@@ -608,4 +608,25 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         window.makeKeyAndOrderFront( nil )
         UserDefaults.standard.set( true, forKey: "showGraphPanel" )
     }
+
+    @IBAction
+    public func stopDevServers( _ sender: Any? )
+    {
+        // Expand Memory Boost sidebar (mutually exclusive with Fan Control).
+        // Menu item selection dismisses the status menu — reopen after expand.
+        let expanding = !( self.infoViewController?.memoryBoostExpanded ?? false )
+        self.infoViewController?.setMemoryBoostExpanded( expanding, animated: false )
+        NSApp.activate( ignoringOtherApps: true )
+
+        guard expanding
+        else
+        {
+            return
+        }
+
+        DispatchQueue.main.async
+        {
+            self.statusItem?.button?.performClick( nil )
+        }
+    }
 }

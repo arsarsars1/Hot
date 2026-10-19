@@ -17,6 +17,11 @@
 		08A1B2C3D4E5F60718293A4B /* FanControlStatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A1B2C3D4E5F60718293A4C /* FanControlStatusMenuController.swift */; };
 		A7E4C1B92F1A4D8E9C0B2D3F /* FanControlDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D5E2A01C3F4A6B9E7D8C4A /* FanControlDiagnostics.swift */; };
 		2086A36ACC894627BFDF98EA /* FanControlWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */; };
+		D1E2F0A70001A001B002C003 /* DevPortSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B002C001 /* DevPortSupport.swift */; };
+		D1E2F0A70001A001B002C004 /* DevPortStopService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B002C002 /* DevPortStopService.swift */; };
+		D1E2F0A70001A001B003C004 /* AppProcessSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */; };
+		D1E2F0A70001A001B003C005 /* AppProcessService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C002 /* AppProcessService.swift */; };
+		D1E2F0A70001A001B003C006 /* MemoryBoostPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */; };
 		05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E8526700772007246FF /* DictionaryIsEmpty.swift */; };
 		05221E88267009A8007246FF /* SensorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E87267009A8007246FF /* SensorViewController.swift */; };
 		05221E8B26700A57007246FF /* SensorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05221E8926700A57007246FF /* SensorViewController.xib */; };
@@ -125,6 +130,11 @@
 		08A1B2C3D4E5F60718293A4C /* FanControlStatusMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlStatusMenuController.swift; sourceTree = "<group>"; };
 		B8D5E2A01C3F4A6B9E7D8C4A /* FanControlDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlDiagnostics.swift; sourceTree = "<group>"; };
 		E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanControlWindowController.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B002C001 /* DevPortSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevPortSupport.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B002C002 /* DevPortStopService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevPortStopService.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProcessSupport.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B003C002 /* AppProcessService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProcessService.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryBoostPanelController.swift; sourceTree = "<group>"; };
 		05221E8526700772007246FF /* DictionaryIsEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryIsEmpty.swift; sourceTree = "<group>"; };
 		05221E87267009A8007246FF /* SensorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorViewController.swift; sourceTree = "<group>"; };
 		05221E8A26700A57007246FF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SensorViewController.xib; sourceTree = "<group>"; };
@@ -254,6 +264,25 @@
 				E1FE2350753241FFB58506D0 /* FanControlWindowController.swift */,
 			);
 			path = FanControl;
+			sourceTree = "<group>";
+		};
+		D1E2F0A70001A001B002C000 /* DevPorts */ = {
+			isa = PBXGroup;
+			children = (
+				D1E2F0A70001A001B002C001 /* DevPortSupport.swift */,
+				D1E2F0A70001A001B002C002 /* DevPortStopService.swift */,
+			);
+			path = DevPorts;
+			sourceTree = "<group>";
+		};
+		D1E2F0A70001A001B003C000 /* MemoryBoost */ = {
+			isa = PBXGroup;
+			children = (
+				D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */,
+				D1E2F0A70001A001B003C002 /* AppProcessService.swift */,
+				D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */,
+			);
+			path = MemoryBoost;
 			sourceTree = "<group>";
 		};
 		057F8AFE251D22360048F1E1 /* Images */ = {
@@ -462,6 +491,8 @@
 				05221E87267009A8007246FF /* SensorViewController.swift */,
 				388C8F762C5523260057EA05 /* FanViewController.swift */,
 				76E02470D9984EE7BB817B88 /* FanControl */,
+				D1E2F0A70001A001B002C000 /* DevPorts */,
+				D1E2F0A70001A001B003C000 /* MemoryBoost */,
 				055A932A252780FD0070F771 /* GraphView.swift */,
 				057F8B0E251D274C0048F1E1 /* Hot-Bridging-Header.h */,
 				055A931F252778C10070F771 /* InfoViewController.swift */,
@@ -676,6 +707,11 @@
 				A7E4C1B92F1A4D8E9C0B2D3F /* FanControlDiagnostics.swift in Sources */,
 				08A1B2C3D4E5F60718293A4B /* FanControlStatusMenuController.swift in Sources */,
 				2086A36ACC894627BFDF98EA /* FanControlWindowController.swift in Sources */,
+				D1E2F0A70001A001B002C003 /* DevPortSupport.swift in Sources */,
+				D1E2F0A70001A001B002C004 /* DevPortStopService.swift in Sources */,
+				D1E2F0A70001A001B003C004 /* AppProcessSupport.swift in Sources */,
+				D1E2F0A70001A001B003C005 /* AppProcessService.swift in Sources */,
+				D1E2F0A70001A001B003C006 /* MemoryBoostPanelController.swift in Sources */,
 				382CF88F2C4FF77400D9DB3C /* FanSpeedToString.swift in Sources */,
 				055A932725277F6E0070F771 /* TemperatureToString.swift in Sources */,
 				05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */,

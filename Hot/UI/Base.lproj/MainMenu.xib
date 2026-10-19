@@ -742,6 +742,12 @@
                         <action selector="detachGraph:" target="Voe-Tx-rLC" id="Tqg-wQ-nfG"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Memory Boost…" toolTip="Memory Boost — quit heavy apps and stop leftover Dev-port listeners" id="Dp1-Hot-Stop">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="stopDevServers:" target="Voe-Tx-rLC" id="Dp2-Hot-Act"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Fan Control" id="Fc1-Hot-Ctrl">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Fan Control" id="Fc3-Hot-Sub">
