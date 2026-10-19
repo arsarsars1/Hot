@@ -22,6 +22,8 @@
 		D1E2F0A70001A001B003C004 /* AppProcessSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */; };
 		D1E2F0A70001A001B003C005 /* AppProcessService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C002 /* AppProcessService.swift */; };
 		D1E2F0A70001A001B003C006 /* MemoryBoostPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */; };
+		D1E2F0A70001A001B003C009 /* SystemMemorySupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C007 /* SystemMemorySupport.swift */; };
+		D1E2F0A70001A001B003C00A /* SystemMemoryMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F0A70001A001B003C008 /* SystemMemoryMeterView.swift */; };
 		05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E8526700772007246FF /* DictionaryIsEmpty.swift */; };
 		05221E88267009A8007246FF /* SensorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05221E87267009A8007246FF /* SensorViewController.swift */; };
 		05221E8B26700A57007246FF /* SensorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05221E8926700A57007246FF /* SensorViewController.xib */; };
@@ -135,6 +137,8 @@
 		D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProcessSupport.swift; sourceTree = "<group>"; };
 		D1E2F0A70001A001B003C002 /* AppProcessService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProcessService.swift; sourceTree = "<group>"; };
 		D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryBoostPanelController.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B003C007 /* SystemMemorySupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMemorySupport.swift; sourceTree = "<group>"; };
+		D1E2F0A70001A001B003C008 /* SystemMemoryMeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMemoryMeterView.swift; sourceTree = "<group>"; };
 		05221E8526700772007246FF /* DictionaryIsEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryIsEmpty.swift; sourceTree = "<group>"; };
 		05221E87267009A8007246FF /* SensorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorViewController.swift; sourceTree = "<group>"; };
 		05221E8A26700A57007246FF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SensorViewController.xib; sourceTree = "<group>"; };
@@ -281,6 +285,8 @@
 				D1E2F0A70001A001B003C001 /* AppProcessSupport.swift */,
 				D1E2F0A70001A001B003C002 /* AppProcessService.swift */,
 				D1E2F0A70001A001B003C003 /* MemoryBoostPanelController.swift */,
+				D1E2F0A70001A001B003C007 /* SystemMemorySupport.swift */,
+				D1E2F0A70001A001B003C008 /* SystemMemoryMeterView.swift */,
 			);
 			path = MemoryBoost;
 			sourceTree = "<group>";
@@ -712,6 +718,8 @@
 				D1E2F0A70001A001B003C004 /* AppProcessSupport.swift in Sources */,
 				D1E2F0A70001A001B003C005 /* AppProcessService.swift in Sources */,
 				D1E2F0A70001A001B003C006 /* MemoryBoostPanelController.swift in Sources */,
+				D1E2F0A70001A001B003C009 /* SystemMemorySupport.swift in Sources */,
+				D1E2F0A70001A001B003C00A /* SystemMemoryMeterView.swift in Sources */,
 				382CF88F2C4FF77400D9DB3C /* FanSpeedToString.swift in Sources */,
 				055A932725277F6E0070F771 /* TemperatureToString.swift in Sources */,
 				05221E8626700772007246FF /* DictionaryIsEmpty.swift in Sources */,

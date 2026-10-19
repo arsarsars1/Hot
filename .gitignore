@@ -33,3 +33,6 @@ Hot.app/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+
+# Local agent plans (keep on disk; do not publish)
+.cursor/plans/

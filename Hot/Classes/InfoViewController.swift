@@ -73,6 +73,7 @@ public class InfoViewController: NSViewController
     private var sidebarMinHeightConstraint: NSLayoutConstraint?
     private var rootWidthConstraint: NSLayoutConstraint?
     private var chevronLabel: NSTextField?
+    private var memoryMeter: SystemMemoryMeterView?
 
     deinit
     {
@@ -120,6 +121,8 @@ public class InfoViewController: NSViewController
 
         self.installFanControlSidebar()
         self.installMetricRowClicks()
+        self.installSystemMemoryMeter()
+        self.refreshMemoryMeter()
     }
 
     @objc
@@ -314,9 +317,34 @@ public class InfoViewController: NSViewController
         }
 
         let panel = MemoryBoostPanelController()
+        panel.onRequestCollapse =
+        {
+            [ weak self ] in
+            self?.setMemoryBoostExpanded( false, animated: true )
+        }
         self.memoryBoostPanel = panel
         self.addChild( panel )
         self.pinPanel( panel.view, in: shell )
+    }
+
+    private func installSystemMemoryMeter()
+    {
+        guard let metricsStack = self.metricsStack, self.memoryMeter == nil
+        else
+        {
+            return
+        }
+
+        let meter = SystemMemoryMeterView()
+        self.memoryMeter = meter
+        metricsStack.addArrangedSubview( meter )
+        meter.widthAnchor.constraint( equalTo: metricsStack.widthAnchor ).isActive = true
+    }
+
+    private func refreshMemoryMeter()
+    {
+        let snap = SystemMemorySupport.snapshot()
+        self.memoryMeter?.apply( snap )
     }
 
     private func pinPanel( _ panelView: NSView, in shell: NSView )
@@ -503,6 +531,7 @@ public class InfoViewController: NSViewController
 
         self.graphViewHeight.constant = self.graphView?.canDisplay ?? false ? 100 : 0
 
+        self.refreshMemoryMeter()
         self.onUpdate?()
     }
 }

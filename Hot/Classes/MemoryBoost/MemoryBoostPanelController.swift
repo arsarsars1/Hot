@@ -30,6 +30,9 @@ final class MemoryBoostPanelController: NSViewController
     private let appService  = AppProcessService.shared
     private let portService = DevPortStopService.shared
 
+    /// Called when the user taps Hide — collapses the Memory Boost sidebar.
+    var onRequestCollapse: ( () -> Void )?
+
     private var appsStack:       NSStackView!
     private var listenersStack:  NSStackView!
     private var appsCountPill:   NSTextField!
@@ -38,11 +41,14 @@ final class MemoryBoostPanelController: NSViewController
     private var stopPortsButton: NSButton!
     private var appsScroll:      NSScrollView!
     private var portsScroll:     NSScrollView!
+    private var contentStack:    NSStackView!
+    private var listsCollapsed   = false
     private var refreshTimer:    Timer?
     private var apps:            [ AppProcessInfo ] = []
     private var listeners:       [ DevPortListener ] = []
     private var isPresented      = false
     private var isBusy           = false
+    private var collapseListsButton: NSButton!
 
     override func loadView()
     {
@@ -124,6 +130,29 @@ final class MemoryBoostPanelController: NSViewController
         let titleSpacer = NSView()
         titleSpacer.setContentHuggingPriority( .defaultLow, for: .horizontal )
         titleRow.addArrangedSubview( titleSpacer )
+
+        self.collapseListsButton = NSButton(
+            title: "▾ Lists",
+            target: self,
+            action: #selector( self.toggleListsCollapsed( _: ) )
+        )
+        self.collapseListsButton.bezelStyle = .recessed
+        self.collapseListsButton.controlSize = .small
+        self.collapseListsButton.font = NSFont.systemFont( ofSize: 10, weight: .medium )
+        self.collapseListsButton.toolTip = "Show or hide the apps and Dev-ports lists"
+        titleRow.addArrangedSubview( self.collapseListsButton )
+
+        let hideButton = NSButton(
+            title: "Hide",
+            target: self,
+            action: #selector( self.hideSidebar( _: ) )
+        )
+        hideButton.bezelStyle = .recessed
+        hideButton.controlSize = .small
+        hideButton.font = NSFont.systemFont( ofSize: 10, weight: .medium )
+        hideButton.toolTip = "Collapse Memory Boost sidebar"
+        titleRow.addArrangedSubview( hideButton )
+
         root.addArrangedSubview( titleRow )
         titleRow.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
 
@@ -132,9 +161,17 @@ final class MemoryBoostPanelController: NSViewController
         subtitle.textColor = .tertiaryLabelColor
         root.addArrangedSubview( subtitle )
 
+        self.contentStack = NSStackView()
+        self.contentStack.orientation = .vertical
+        self.contentStack.alignment = .leading
+        self.contentStack.spacing = spacing
+        self.contentStack.translatesAutoresizingMaskIntoConstraints = false
+        root.addArrangedSubview( self.contentStack )
+        self.contentStack.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
+
         let ( appsHeader, appsPill ) = self.makeSectionHeader( title: "Apps", detail: "by memory" )
         self.appsCountPill = appsPill
-        root.addArrangedSubview( appsHeader )
+        self.contentStack.addArrangedSubview( appsHeader )
 
         self.appsStack = NSStackView()
         self.appsStack.orientation = .vertical
@@ -143,22 +180,22 @@ final class MemoryBoostPanelController: NSViewController
         self.appsStack.translatesAutoresizingMaskIntoConstraints = false
 
         self.appsScroll = self.makeScrollHost( documentStack: self.appsStack, height: 180 )
-        root.addArrangedSubview( self.appsScroll )
-        self.appsScroll.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
+        self.contentStack.addArrangedSubview( self.appsScroll )
+        self.appsScroll.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
         let quitHint = NSTextField( labelWithString: "⌥-click Quit to Force Quit" )
         quitHint.font = NSFont.systemFont( ofSize: 9, weight: .medium )
         quitHint.textColor = .tertiaryLabelColor
-        root.addArrangedSubview( quitHint )
+        self.contentStack.addArrangedSubview( quitHint )
 
-        root.addArrangedSubview( self.makeHairline() )
+        self.contentStack.addArrangedSubview( self.makeHairline() )
 
         let ( portsHeader, portsPill ) = self.makeSectionHeader(
             title: "Dev ports",
             detail: "3000–3002 · 5173–5176 · 5199"
         )
         self.portsCountPill = portsPill
-        root.addArrangedSubview( portsHeader )
+        self.contentStack.addArrangedSubview( portsHeader )
 
         self.listenersStack = NSStackView()
         self.listenersStack.orientation = .vertical
@@ -167,8 +204,8 @@ final class MemoryBoostPanelController: NSViewController
         self.listenersStack.translatesAutoresizingMaskIntoConstraints = false
 
         self.portsScroll = self.makeScrollHost( documentStack: self.listenersStack, height: 100 )
-        root.addArrangedSubview( self.portsScroll )
-        self.portsScroll.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
+        self.contentStack.addArrangedSubview( self.portsScroll )
+        self.portsScroll.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
         let stopRow = NSStackView()
         stopRow.orientation = .horizontal
@@ -190,8 +227,8 @@ final class MemoryBoostPanelController: NSViewController
         let stopSpacer = NSView()
         stopSpacer.setContentHuggingPriority( .defaultLow, for: .horizontal )
         stopRow.addArrangedSubview( stopSpacer )
-        root.addArrangedSubview( stopRow )
-        stopRow.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
+        self.contentStack.addArrangedSubview( stopRow )
+        stopRow.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
         let portsHint = NSTextField(
             wrappingLabelWithString: "Stops those processes (not only the sockets) so Dev ports are free again."
@@ -199,7 +236,7 @@ final class MemoryBoostPanelController: NSViewController
         portsHint.font = NSFont.systemFont( ofSize: 9 )
         portsHint.textColor = .tertiaryLabelColor
         portsHint.preferredMaxLayoutWidth = 300
-        root.addArrangedSubview( portsHint )
+        self.contentStack.addArrangedSubview( portsHint )
 
         self.statusLabel = NSTextField( labelWithString: "Ready" )
         self.statusLabel.font = NSFont.systemFont( ofSize: 10, weight: .medium )
@@ -208,6 +245,25 @@ final class MemoryBoostPanelController: NSViewController
         self.statusLabel.preferredMaxLayoutWidth = 300
         self.statusLabel.setContentHuggingPriority( .required, for: .vertical )
         root.addArrangedSubview( self.wrapInPill( self.statusLabel ) )
+    }
+
+    @objc
+    private func hideSidebar( _ sender: Any? )
+    {
+        self.onRequestCollapse?()
+    }
+
+    @objc
+    private func toggleListsCollapsed( _ sender: Any? )
+    {
+        self.listsCollapsed.toggle()
+        self.contentStack.isHidden = self.listsCollapsed
+        self.collapseListsButton.title = self.listsCollapsed ? "▸ Lists" : "▾ Lists"
+        self.view.needsLayout = true
+        if let menu = self.view.enclosingMenuItem?.menu
+        {
+            menu.itemChanged( self.view.enclosingMenuItem! )
+        }
     }
 
     private func makeSectionHeader( title: String, detail: String ) -> ( NSView, NSTextField )
