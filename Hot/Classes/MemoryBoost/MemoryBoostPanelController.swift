@@ -24,9 +24,14 @@
 
 import Cocoa
 
-/// Compact status-menu sidebar: GUI apps by memory + Dev-ports Stop All.
+/// Compact status-menu sidebar: processes by RAM + Dev-ports Stop All.
 final class MemoryBoostPanelController: NSViewController
 {
+    private static let panelWidth: CGFloat  = 340
+    private static let panelHeight: CGFloat = 420
+    /// Main-thread render budget: scroll shows top-N by RAM; pill shows total scanned.
+    private static let visibleProcessLimit = 48
+
     private let appService  = AppProcessService.shared
     private let portService = DevPortStopService.shared
 
@@ -38,21 +43,32 @@ final class MemoryBoostPanelController: NSViewController
     private var appsCountPill:   NSTextField!
     private var portsCountPill:  NSTextField!
     private var statusLabel:     NSTextField!
+    private var statusSpinner:   NSProgressIndicator!
     private var stopPortsButton: NSButton!
     private var appsScroll:      NSScrollView!
     private var portsScroll:     NSScrollView!
     private var contentStack:    NSStackView!
+    private var contentHeightConstraint: NSLayoutConstraint?
     private var listsCollapsed   = false
     private var refreshTimer:    Timer?
     private var apps:            [ AppProcessInfo ] = []
     private var listeners:       [ DevPortListener ] = []
     private var isPresented      = false
     private var isBusy           = false
+    /// True while an open-path / cold list refresh is in flight (skeletons + status pill).
+    private var refreshInFlight  = false
     private var collapseListsButton: NSButton!
+    /// PID → live row for diff updates (no full stack teardown each tick).
+    private var appRowByPID:     [ pid_t: AppProcessRowView ] = [:]
+    /// Icons keyed by bundle ID or `pid:<n>`; resolved once, not every refresh.
+    private var iconByCacheKey:  [ String: NSImage ] = [:]
+    /// Keys whose cached image is an SF Symbol placeholder (tint on image view).
+    private var symbolIconKeys:  Set<String> = []
+    private var showingAppSkeletons = false
 
     override func loadView()
     {
-        let root = NSView( frame: NSRect( x: 0, y: 0, width: 340, height: 420 ) )
+        let root = NSView( frame: NSRect( x: 0, y: 0, width: Self.panelWidth, height: Self.panelHeight ) )
         root.wantsLayer = true
         self.view = root
         self.buildUI()
@@ -66,7 +82,31 @@ final class MemoryBoostPanelController: NSViewController
     func prepareForSidebarDisplay()
     {
         self.isPresented = true
-        self.reloadAll()
+        self.refreshInFlight = true
+
+        // Cache-first: paint last snapshot immediately; never wait on main for a scan.
+        // Sidebar width animation must not wait on data (skeletons / Updating only).
+        if let appSnap = self.appService.cachedSnapshot
+        {
+            self.apps = appSnap.apps
+            self.applyAppRows()
+            self.setListStatus( .updating )
+        }
+        else
+        {
+            self.apps = []
+            self.applyAppRows()
+            self.setListStatus( .scanning )
+        }
+
+        if let portSnap = self.portService.cachedSnapshot
+        {
+            self.listeners = portSnap.listeners
+            self.rebuildListenerRows()
+        }
+
+        self.applyListsCollapsedVisibility()
+        self.reloadAll( forceRefresh: true )
         self.startRefreshTimer()
     }
 
@@ -75,6 +115,7 @@ final class MemoryBoostPanelController: NSViewController
         self.isPresented = false
         self.refreshTimer?.invalidate()
         self.refreshTimer = nil
+        // Closed-cadence warmer on AppProcessService keeps running.
     }
 
     // MARK: - UI
@@ -156,7 +197,7 @@ final class MemoryBoostPanelController: NSViewController
         root.addArrangedSubview( titleRow )
         titleRow.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
 
-        let subtitle = NSTextField( labelWithString: "Quit heavy apps · free Dev ports" )
+        let subtitle = NSTextField( labelWithString: "All processes · RAM high → low" )
         subtitle.font = NSFont.systemFont( ofSize: 10, weight: .regular )
         subtitle.textColor = .tertiaryLabelColor
         root.addArrangedSubview( subtitle )
@@ -168,22 +209,24 @@ final class MemoryBoostPanelController: NSViewController
         self.contentStack.translatesAutoresizingMaskIntoConstraints = false
         root.addArrangedSubview( self.contentStack )
         self.contentStack.widthAnchor.constraint( equalTo: root.widthAnchor, constant: -( inset * 2 ) ).isActive = true
+        self.contentStack.setContentHuggingPriority( .defaultLow, for: .vertical )
+        self.contentStack.setContentCompressionResistancePriority( .defaultLow, for: .vertical )
 
-        let ( appsHeader, appsPill ) = self.makeSectionHeader( title: "Apps", detail: "by memory" )
+        let ( appsHeader, appsPill ) = self.makeSectionHeader( title: "Processes", detail: "RAM ↓" )
         self.appsCountPill = appsPill
         self.contentStack.addArrangedSubview( appsHeader )
 
         self.appsStack = NSStackView()
         self.appsStack.orientation = .vertical
         self.appsStack.alignment = .width
-        self.appsStack.spacing = 5
+        self.appsStack.spacing = 4
         self.appsStack.translatesAutoresizingMaskIntoConstraints = false
 
-        self.appsScroll = self.makeScrollHost( documentStack: self.appsStack, height: 180 )
+        self.appsScroll = self.makeScrollHost( documentStack: self.appsStack, height: 200 )
         self.contentStack.addArrangedSubview( self.appsScroll )
         self.appsScroll.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
-        let quitHint = NSTextField( labelWithString: "⌥-click Quit to Force Quit" )
+        let quitHint = NSTextField( labelWithString: "⌥-click Quit to Force Quit · helpers use signal" )
         quitHint.font = NSFont.systemFont( ofSize: 9, weight: .medium )
         quitHint.textColor = .tertiaryLabelColor
         self.contentStack.addArrangedSubview( quitHint )
@@ -242,9 +285,19 @@ final class MemoryBoostPanelController: NSViewController
         self.statusLabel.font = NSFont.systemFont( ofSize: 10, weight: .medium )
         self.statusLabel.textColor = .secondaryLabelColor
         self.statusLabel.maximumNumberOfLines = 2
-        self.statusLabel.preferredMaxLayoutWidth = 300
+        self.statusLabel.preferredMaxLayoutWidth = 280
         self.statusLabel.setContentHuggingPriority( .required, for: .vertical )
-        root.addArrangedSubview( self.wrapInPill( self.statusLabel ) )
+        self.statusLabel.setContentCompressionResistancePriority( .defaultLow, for: .horizontal )
+
+        self.statusSpinner = NSProgressIndicator()
+        self.statusSpinner.style = .spinning
+        self.statusSpinner.controlSize = .small
+        self.statusSpinner.isDisplayedWhenStopped = false
+        self.statusSpinner.translatesAutoresizingMaskIntoConstraints = false
+        self.statusSpinner.widthAnchor.constraint( equalToConstant: 12 ).isActive = true
+        self.statusSpinner.heightAnchor.constraint( equalToConstant: 12 ).isActive = true
+
+        root.addArrangedSubview( self.makeStatusPill() )
     }
 
     @objc
@@ -257,8 +310,31 @@ final class MemoryBoostPanelController: NSViewController
     private func toggleListsCollapsed( _ sender: Any? )
     {
         self.listsCollapsed.toggle()
-        self.contentStack.isHidden = self.listsCollapsed
         self.collapseListsButton.title = self.listsCollapsed ? "▸ Lists" : "▾ Lists"
+
+        if self.listsCollapsed
+        {
+            // Capture current height, then hide children while keeping the slot.
+            self.contentStack.layoutSubtreeIfNeeded()
+            let kept = max( self.contentStack.fittingSize.height, 280 )
+            self.contentHeightConstraint?.isActive = false
+            let height = self.contentStack.heightAnchor.constraint( equalToConstant: kept )
+            height.priority = .required
+            height.isActive = true
+            self.contentHeightConstraint = height
+            self.contentStack.arrangedSubviews.forEach { $0.isHidden = true }
+            self.contentStack.alphaValue = 0
+        }
+        else
+        {
+            self.contentHeightConstraint?.isActive = false
+            self.contentHeightConstraint = nil
+            self.contentStack.arrangedSubviews.forEach { $0.isHidden = false }
+            self.contentStack.alphaValue = 1
+        }
+
+        // Geometry is pinned on the root — do not let the menu reflow smaller.
+        self.view.frame.size = NSSize( width: Self.panelWidth, height: Self.panelHeight )
         self.view.needsLayout = true
         if let menu = self.view.enclosingMenuItem?.menu
         {
@@ -358,37 +434,85 @@ final class MemoryBoostPanelController: NSViewController
         return scroll
     }
 
-    private func wrapInPill( _ label: NSTextField ) -> NSView
+    private func makeStatusPill() -> NSView
     {
+        let row = NSStackView()
+        row.orientation = .horizontal
+        row.alignment = .centerY
+        row.spacing = 6
+        row.translatesAutoresizingMaskIntoConstraints = false
+        row.addArrangedSubview( self.statusSpinner )
+        row.addArrangedSubview( self.statusLabel )
+
         let wrap = NSView()
         wrap.wantsLayer = true
         wrap.layer?.cornerRadius = 8
         wrap.layer?.backgroundColor = NSColor.labelColor.withAlphaComponent( 0.05 ).cgColor
         wrap.translatesAutoresizingMaskIntoConstraints = false
-        label.translatesAutoresizingMaskIntoConstraints = false
-        wrap.addSubview( label )
+        wrap.addSubview( row )
         NSLayoutConstraint.activate(
             [
-                label.leadingAnchor.constraint( equalTo: wrap.leadingAnchor, constant: 8 ),
-                label.trailingAnchor.constraint( equalTo: wrap.trailingAnchor, constant: -8 ),
-                label.topAnchor.constraint( equalTo: wrap.topAnchor, constant: 5 ),
-                label.bottomAnchor.constraint( equalTo: wrap.bottomAnchor, constant: -5 ),
+                row.leadingAnchor.constraint( equalTo: wrap.leadingAnchor, constant: 8 ),
+                row.trailingAnchor.constraint( equalTo: wrap.trailingAnchor, constant: -8 ),
+                row.topAnchor.constraint( equalTo: wrap.topAnchor, constant: 5 ),
+                row.bottomAnchor.constraint( equalTo: wrap.bottomAnchor, constant: -5 ),
                 wrap.widthAnchor.constraint( equalToConstant: 316 ),
             ]
         )
         return wrap
     }
 
-    private func makeCardRow() -> NSStackView
+    private enum ListStatus
+    {
+        case ready
+        case scanning
+        case updating
+    }
+
+    private func setListStatus( _ status: ListStatus )
+    {
+        switch status
+        {
+            case .ready:
+                self.statusLabel.stringValue = "Ready"
+                self.statusSpinner.stopAnimation( nil )
+
+            case .scanning:
+                self.statusLabel.stringValue = "Scanning processes…"
+                self.statusSpinner.startAnimation( nil )
+
+            case .updating:
+                self.statusLabel.stringValue = "Updating…"
+                self.statusSpinner.startAnimation( nil )
+        }
+    }
+
+    private func isListLoadingStatus( _ value: String ) -> Bool
+    {
+        value == "Updating…" || value == "Scanning processes…"
+    }
+
+    private func makeCardRow( emphasized: Bool = false ) -> NSStackView
     {
         let row = NSStackView()
         row.orientation = .horizontal
         row.alignment = .centerY
         row.spacing = 8
-        row.edgeInsets = NSEdgeInsets( top: 6, left: 8, bottom: 6, right: 8 )
+        row.edgeInsets = NSEdgeInsets( top: 7, left: 8, bottom: 7, right: 8 )
         row.wantsLayer = true
-        row.layer?.cornerRadius = 7
-        row.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent( 0.85 ).cgColor
+        row.layer?.cornerRadius = 8
+        if emphasized
+        {
+            row.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent( 0.12 ).cgColor
+            row.layer?.borderWidth = 1
+            row.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent( 0.22 ).cgColor
+        }
+        else
+        {
+            row.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent( 0.9 ).cgColor
+            row.layer?.borderWidth = 1
+            row.layer?.borderColor = NSColor.labelColor.withAlphaComponent( 0.06 ).cgColor
+        }
         row.translatesAutoresizingMaskIntoConstraints = false
         return row
     }
@@ -398,16 +522,17 @@ final class MemoryBoostPanelController: NSViewController
     private func startRefreshTimer()
     {
         self.refreshTimer?.invalidate()
-        let timer = Timer( timeInterval: 2.0, repeats: true )
+        let timer = Timer( timeInterval: AppProcessService.openMaxAge, repeats: true )
         {
             [ weak self ] _ in
-            self?.reloadAll()
+            self?.reloadAll( forceRefresh: false )
         }
         RunLoop.main.add( timer, forMode: .common )
         self.refreshTimer = timer
     }
 
-    private func reloadAll()
+    /// Apply cached / refreshed snapshots. `forceRefresh` bypasses maxAge (open + post-quit).
+    private func reloadAll( forceRefresh: Bool )
     {
         guard self.isPresented, self.isBusy == false
         else
@@ -415,29 +540,91 @@ final class MemoryBoostPanelController: NSViewController
             return
         }
 
-        // NSWorkspace must be queried on the main thread — off-main often returns [].
-        let apps = self.appService.listRegularApps()
-        self.apps = apps
-        self.rebuildAppRows()
+        let appMaxAge  = forceRefresh ? 0 : AppProcessService.openMaxAge
+        let portMaxAge = forceRefresh ? 0 : DevPortStopService.openMaxAge
 
-        DispatchQueue.global( qos: .utility ).async
+        var pendingApps: [ AppProcessInfo ]?
+        var pendingListeners: [ DevPortListener ]?
+        let gate = DispatchQueue( label: "hot.memoryBoost.reloadGate" )
+
+        let applyIfReady: () -> Void =
         {
             [ weak self ] in
-            let listeners = self?.portService.discoverListeners() ?? []
-
-            DispatchQueue.main.async
+            gate.async
             {
-                [ weak self ] in
-                guard let self = self, self.isPresented
+                guard let apps = pendingApps, let listeners = pendingListeners
                 else
                 {
                     return
                 }
 
-                self.listeners = listeners
-                self.rebuildListenerRows()
+                DispatchQueue.main.async
+                {
+                    [ weak self ] in
+                    guard let self = self, self.isPresented, self.isBusy == false
+                    else
+                    {
+                        return
+                    }
+
+                    self.refreshInFlight = false
+
+                    // Skip UI work when content is unchanged (open cadence ~3s).
+                    let appsUnchanged = apps == self.apps
+                    let listenersUnchanged = listeners == self.listeners
+
+                    if appsUnchanged == false
+                    {
+                        self.apps = apps
+                        self.applyAppRows()
+                    }
+
+                    if listenersUnchanged == false
+                    {
+                        self.listeners = listeners
+                        self.rebuildListenerRows()
+                    }
+
+                    self.applyListsCollapsedVisibility()
+                    if self.isListLoadingStatus( self.statusLabel.stringValue )
+                    {
+                        self.setListStatus( .ready )
+                    }
+                }
             }
         }
+
+        self.appService.refreshIfNeeded( maxAge: appMaxAge )
+        {
+            snap in
+            gate.async
+            {
+                pendingApps = snap.apps
+                applyIfReady()
+            }
+        }
+
+        self.portService.refreshIfNeeded( maxAge: portMaxAge )
+        {
+            snap in
+            gate.async
+            {
+                pendingListeners = snap.listeners
+                applyIfReady()
+            }
+        }
+    }
+
+    private func applyListsCollapsedVisibility()
+    {
+        guard self.listsCollapsed
+        else
+        {
+            return
+        }
+
+        self.contentStack.arrangedSubviews.forEach { $0.isHidden = true }
+        self.contentStack.alphaValue = 0
     }
 
     private func clearStack( _ stack: NSStackView )
@@ -449,81 +636,207 @@ final class MemoryBoostPanelController: NSViewController
         }
     }
 
-    private func rebuildAppRows()
+    private func clearAppRowPool()
     {
-        self.clearStack( self.appsStack )
+        for ( _, row ) in self.appRowByPID
+        {
+            self.appsStack.removeArrangedSubview( row )
+            row.removeFromSuperview()
+        }
+        self.appRowByPID.removeAll( keepingCapacity: true )
+    }
+
+    /// Diff-apply top-N rows by PID; pill shows total scanned count.
+    private func applyAppRows()
+    {
         self.appsCountPill.stringValue = "\( self.apps.count )"
 
         if self.apps.isEmpty
         {
-            let empty = NSTextField( labelWithString: "No other GUI apps" )
-            empty.font = NSFont.systemFont( ofSize: 11 )
-            empty.textColor = .tertiaryLabelColor
-            self.appsStack.addArrangedSubview( empty )
+            self.clearAppRowPool()
+            self.clearStack( self.appsStack )
+            self.showingAppSkeletons = false
+
+            if self.refreshInFlight
+            {
+                self.appsCountPill.stringValue = "…"
+                self.showingAppSkeletons = true
+                for _ in 0 ..< 4
+                {
+                    self.appsStack.addArrangedSubview( self.makeSkeletonAppRow() )
+                }
+            }
+            else
+            {
+                let empty = NSTextField( labelWithString: "No processes to list" )
+                empty.font = NSFont.systemFont( ofSize: 11 )
+                empty.textColor = .tertiaryLabelColor
+                self.appsStack.addArrangedSubview( empty )
+            }
             self.layoutDocument( self.appsStack, in: self.appsScroll )
             return
         }
 
-        for ( index, app ) in self.apps.enumerated()
+        // Drop skeletons / empty placeholder before first real rows land.
+        if self.showingAppSkeletons || ( self.appRowByPID.isEmpty && self.appsStack.arrangedSubviews.isEmpty == false )
         {
-            self.appsStack.addArrangedSubview( self.makeAppRow( app: app, tag: index ) )
+            self.clearStack( self.appsStack )
+            self.showingAppSkeletons = false
         }
 
+        let visible = Array( self.apps.prefix( Self.visibleProcessLimit ) )
+        let newPIDs = Set( visible.map( \.pid ) )
+
+        for pid in self.appRowByPID.keys.filter( { newPIDs.contains( $0 ) == false } )
+        {
+            if let row = self.appRowByPID.removeValue( forKey: pid )
+            {
+                self.appsStack.removeArrangedSubview( row )
+                row.removeFromSuperview()
+            }
+        }
+
+        for ( index, app ) in visible.enumerated()
+        {
+            let rank = index + 1
+            if let row = self.appRowByPID[ app.pid ]
+            {
+                row.update( app: app, rank: rank )
+            }
+            else
+            {
+                let row = self.makeAppProcessRow( app: app, rank: rank )
+                self.appRowByPID[ app.pid ] = row
+                let insertAt = min( index, self.appsStack.arrangedSubviews.count )
+                self.appsStack.insertArrangedSubview( row, at: insertAt )
+            }
+        }
+
+        self.syncAppRowOrder( visible )
         self.layoutDocument( self.appsStack, in: self.appsScroll )
     }
 
-    private func makeAppRow( app: AppProcessInfo, tag: Int ) -> NSView
+    private func syncAppRowOrder( _ visible: [ AppProcessInfo ] )
+    {
+        for ( index, app ) in visible.enumerated()
+        {
+            guard let row = self.appRowByPID[ app.pid ]
+            else
+            {
+                continue
+            }
+
+            let arranged = self.appsStack.arrangedSubviews
+            if index < arranged.count, arranged[ index ] === row
+            {
+                continue
+            }
+
+            self.appsStack.removeArrangedSubview( row )
+            row.removeFromSuperview()
+            let insertAt = min( index, self.appsStack.arrangedSubviews.count )
+            self.appsStack.insertArrangedSubview( row, at: insertAt )
+        }
+    }
+
+    /// Muted placeholder cards shown while `apps.isEmpty && refreshInFlight`.
+    private func makeSkeletonAppRow() -> NSView
     {
         let row = self.makeCardRow()
+        row.layer?.backgroundColor = NSColor.labelColor.withAlphaComponent( 0.04 ).cgColor
+        row.layer?.borderColor = NSColor.labelColor.withAlphaComponent( 0.04 ).cgColor
 
-        let icon = NSImageView()
-        icon.imageScaling = .scaleProportionallyUpOrDown
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        icon.widthAnchor.constraint( equalToConstant: 22 ).isActive = true
-        icon.heightAnchor.constraint( equalToConstant: 22 ).isActive = true
-
-        if let running = NSRunningApplication( processIdentifier: app.pid )
+        let bone: ( CGFloat, CGFloat ) -> NSView =
         {
-            icon.image = running.icon
+            width, height in
+            let view = NSView()
+            view.wantsLayer = true
+            view.layer?.cornerRadius = height / 2
+            view.layer?.backgroundColor = NSColor.labelColor.withAlphaComponent( 0.08 ).cgColor
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.widthAnchor.constraint( equalToConstant: width ).isActive = true
+            view.heightAnchor.constraint( equalToConstant: height ).isActive = true
+            return view
         }
 
+        row.addArrangedSubview( bone( 18, 10 ) )
+
+        let icon = NSView()
+        icon.wantsLayer = true
+        icon.layer?.cornerRadius = 5
+        icon.layer?.backgroundColor = NSColor.labelColor.withAlphaComponent( 0.08 ).cgColor
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        icon.widthAnchor.constraint( equalToConstant: 24 ).isActive = true
+        icon.heightAnchor.constraint( equalToConstant: 24 ).isActive = true
         row.addArrangedSubview( icon )
 
         let nameCol = NSStackView()
         nameCol.orientation = .vertical
         nameCol.alignment = .leading
-        nameCol.spacing = 1
-
-        let name = NSTextField( labelWithString: app.name )
-        name.font = NSFont.systemFont( ofSize: 11, weight: .medium )
-        name.lineBreakMode = .byTruncatingTail
-        name.setContentCompressionResistancePriority( .defaultLow, for: .horizontal )
-        nameCol.addArrangedSubview( name )
-
-        let memText = app.memoryUnknown
-            ? "memory n/a"
-            : AppProcessSupport.formatBytes( app.residentBytes )
-        let mem = NSTextField( labelWithString: memText )
-        mem.font = NSFont.monospacedDigitSystemFont( ofSize: 9, weight: .regular )
-        mem.textColor = .tertiaryLabelColor
-        nameCol.addArrangedSubview( mem )
-
+        nameCol.spacing = 4
+        nameCol.addArrangedSubview( bone( 120, 10 ) )
+        nameCol.addArrangedSubview( bone( 72, 8 ) )
         row.addArrangedSubview( nameCol )
-        nameCol.setContentCompressionResistancePriority( .defaultLow, for: .horizontal )
 
         let spacer = NSView()
         spacer.setContentHuggingPriority( .defaultLow, for: .horizontal )
         row.addArrangedSubview( spacer )
 
-        let quit = NSButton( title: "Quit", target: self, action: #selector( self.quitApp( _: ) ) )
-        quit.bezelStyle = .recessed
-        quit.controlSize = .small
-        quit.font = NSFont.systemFont( ofSize: 10, weight: .medium )
-        quit.tag = tag
-        quit.setContentHuggingPriority( .required, for: .horizontal )
-        row.addArrangedSubview( quit )
+        row.addArrangedSubview( bone( 52, 16 ) )
+        row.addArrangedSubview( bone( 36, 16 ) )
 
         return row
+    }
+
+    private func makeAppProcessRow( app: AppProcessInfo, rank: Int ) -> AppProcessRowView
+    {
+        let row = AppProcessRowView()
+        row.configureChrome( emphasized: rank <= 3 )
+        row.quitButton.target = self
+        row.quitButton.action = #selector( self.quitApp( _: ) )
+        let resolved = self.cachedIcon( for: app )
+        row.iconView.image = resolved.image
+        if resolved.isSymbol
+        {
+            row.iconView.contentTintColor = .secondaryLabelColor
+        }
+        row.update( app: app, rank: rank )
+        return row
+    }
+
+    /// Resolve icon once per bundle / PID; SF Symbol placeholders when no app icon.
+    private func cachedIcon( for app: AppProcessInfo ) -> ( image: NSImage?, isSymbol: Bool )
+    {
+        let key = app.bundleIdentifier ?? "pid:\( app.pid )"
+        if let cached = self.iconByCacheKey[ key ]
+        {
+            return ( cached, self.symbolIconKeys.contains( key ) )
+        }
+
+        var image: NSImage?
+        var isSymbol = false
+        if let running = NSRunningApplication( processIdentifier: app.pid ),
+           let icon = running.icon
+        {
+            image = icon
+        }
+        else if #available( macOS 11.0, * )
+        {
+            let symbol = app.isRegularApp ? "app.fill" : "gearshape.2.fill"
+            image = NSImage( systemSymbolName: symbol, accessibilityDescription: nil )
+            isSymbol = image != nil
+        }
+
+        if let image = image
+        {
+            self.iconByCacheKey[ key ] = image
+            if isSymbol
+            {
+                self.symbolIconKeys.insert( key )
+            }
+        }
+
+        return ( image, isSymbol )
     }
 
     private func rebuildListenerRows()
@@ -599,15 +912,13 @@ final class MemoryBoostPanelController: NSViewController
     private func quitApp( _ sender: Any? )
     {
         guard let button = sender as? NSButton,
-              button.tag >= 0,
-              button.tag < self.apps.count,
-              self.isBusy == false
+              self.isBusy == false,
+              let app = self.apps.first( where: { Int( $0.pid ) == button.tag } )
         else
         {
             return
         }
 
-        let app   = self.apps[ button.tag ]
         let force = NSEvent.modifierFlags.contains( .option )
         self.isBusy = true
         self.statusLabel.stringValue = force ? "Force quitting \( app.name )…" : "Quitting \( app.name )…"
@@ -648,7 +959,7 @@ final class MemoryBoostPanelController: NSViewController
                         self.statusLabel.stringValue = "Could not quit \( app.name )."
                 }
 
-                self.reloadAll()
+                self.reloadAll( forceRefresh: true )
             }
         }
     }
@@ -699,8 +1010,151 @@ final class MemoryBoostPanelController: NSViewController
                             "Stopped \( stopped.count ); \( failed.count ) failed."
                 }
 
-                self.reloadAll()
+                self.reloadAll( forceRefresh: true )
             }
         }
+    }
+}
+
+// MARK: - App process row (PID-keyed reuse)
+
+/// Card row for one process; updated in place on refresh (rank + memory), not recreated.
+private final class AppProcessRowView: NSStackView
+{
+    let rankLabel = NSTextField( labelWithString: "0" )
+    let iconView = NSImageView()
+    let nameLabel = NSTextField( labelWithString: "" )
+    let metaLabel = NSTextField( labelWithString: "" )
+    let memLabel = NSTextField( labelWithString: "" )
+    private let memWrap = NSView()
+    let quitButton = NSButton( title: "Quit", target: nil, action: nil )
+
+    private var boundPID: pid_t = 0
+
+    override init( frame frameRect: NSRect )
+    {
+        super.init( frame: frameRect )
+        self.build()
+    }
+
+    @available( *, unavailable )
+    required init?( coder: NSCoder )
+    {
+        fatalError( "init(coder:) has not been implemented" )
+    }
+
+    func configureChrome( emphasized: Bool )
+    {
+        self.wantsLayer = true
+        self.layer?.cornerRadius = 8
+        if emphasized
+        {
+            self.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent( 0.12 ).cgColor
+            self.layer?.borderWidth = 1
+            self.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent( 0.22 ).cgColor
+        }
+        else
+        {
+            self.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent( 0.9 ).cgColor
+            self.layer?.borderWidth = 1
+            self.layer?.borderColor = NSColor.labelColor.withAlphaComponent( 0.06 ).cgColor
+        }
+    }
+
+    func update( app: AppProcessInfo, rank: Int )
+    {
+        self.boundPID = app.pid
+        let heavy = app.residentBytes >= 500_000_000
+        let emphasized = rank <= 3
+
+        self.rankLabel.stringValue = "\( rank )"
+        self.rankLabel.textColor = emphasized ? .controlAccentColor : .tertiaryLabelColor
+        self.configureChrome( emphasized: emphasized )
+
+        self.nameLabel.stringValue = app.name
+        let kind = app.isRegularApp ? "App" : "Process"
+        self.metaLabel.stringValue = "\( kind ) · PID \( app.pid )"
+
+        let memText = app.memoryUnknown
+            ? "n/a"
+            : AppProcessSupport.formatBytes( app.residentBytes )
+        self.memLabel.stringValue = memText
+        self.memLabel.textColor = heavy ? .controlAccentColor : .secondaryLabelColor
+        self.memWrap.layer?.backgroundColor = ( heavy
+            ? NSColor.controlAccentColor.withAlphaComponent( 0.14 )
+            : NSColor.labelColor.withAlphaComponent( 0.07 ) ).cgColor
+
+        self.quitButton.tag = Int( app.pid )
+        self.toolTip = "\( app.name ) — \( memText ) · PID \( app.pid )"
+    }
+
+    private func build()
+    {
+        self.orientation = .horizontal
+        self.alignment = .centerY
+        self.spacing = 8
+        self.edgeInsets = NSEdgeInsets( top: 7, left: 8, bottom: 7, right: 8 )
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.configureChrome( emphasized: false )
+
+        self.rankLabel.font = NSFont.monospacedDigitSystemFont( ofSize: 9, weight: .bold )
+        self.rankLabel.alignment = .center
+        self.rankLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.rankLabel.widthAnchor.constraint( equalToConstant: 18 ).isActive = true
+        self.addArrangedSubview( self.rankLabel )
+
+        self.iconView.imageScaling = .scaleProportionallyUpOrDown
+        self.iconView.translatesAutoresizingMaskIntoConstraints = false
+        self.iconView.widthAnchor.constraint( equalToConstant: 24 ).isActive = true
+        self.iconView.heightAnchor.constraint( equalToConstant: 24 ).isActive = true
+        self.addArrangedSubview( self.iconView )
+
+        let nameCol = NSStackView()
+        nameCol.orientation = .vertical
+        nameCol.alignment = .leading
+        nameCol.spacing = 1
+
+        self.nameLabel.font = NSFont.systemFont( ofSize: 11, weight: .semibold )
+        self.nameLabel.lineBreakMode = .byTruncatingTail
+        self.nameLabel.setContentCompressionResistancePriority( .defaultLow, for: .horizontal )
+        nameCol.addArrangedSubview( self.nameLabel )
+
+        self.metaLabel.font = NSFont.systemFont( ofSize: 9, weight: .regular )
+        self.metaLabel.textColor = .tertiaryLabelColor
+        nameCol.addArrangedSubview( self.metaLabel )
+
+        self.addArrangedSubview( nameCol )
+        nameCol.setContentCompressionResistancePriority( .defaultLow, for: .horizontal )
+
+        let spacer = NSView()
+        spacer.setContentHuggingPriority( .defaultLow, for: .horizontal )
+        self.addArrangedSubview( spacer )
+
+        self.memLabel.font = NSFont.monospacedDigitSystemFont( ofSize: 10, weight: .semibold )
+        self.memLabel.alignment = .center
+        self.memLabel.drawsBackground = false
+        self.memLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        self.memWrap.wantsLayer = true
+        self.memWrap.layer?.cornerRadius = 6
+        self.memWrap.translatesAutoresizingMaskIntoConstraints = false
+        self.memWrap.addSubview( self.memLabel )
+        NSLayoutConstraint.activate(
+            [
+                self.memLabel.leadingAnchor.constraint( equalTo: self.memWrap.leadingAnchor, constant: 6 ),
+                self.memLabel.trailingAnchor.constraint( equalTo: self.memWrap.trailingAnchor, constant: -6 ),
+                self.memLabel.topAnchor.constraint( equalTo: self.memWrap.topAnchor, constant: 2 ),
+                self.memLabel.bottomAnchor.constraint( equalTo: self.memWrap.bottomAnchor, constant: -2 ),
+                self.memWrap.widthAnchor.constraint( greaterThanOrEqualToConstant: 52 ),
+            ]
+        )
+        self.memWrap.setContentHuggingPriority( .required, for: .horizontal )
+        self.addArrangedSubview( self.memWrap )
+
+        self.quitButton.bezelStyle = .recessed
+        self.quitButton.controlSize = .small
+        self.quitButton.font = NSFont.systemFont( ofSize: 10, weight: .medium )
+        self.quitButton.setContentHuggingPriority( .required, for: .horizontal )
+        self.addArrangedSubview( self.quitButton )
     }
 }

@@ -153,6 +153,10 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         )
         self.fanControlStatusMenu = fanMenu
 
+        // Warm Memory Boost caches after UI is up (closed-cadence continues).
+        AppProcessService.shared.startBackgroundWarming( deferred: 1.0 )
+        DevPortStopService.shared.startBackgroundWarming( deferred: 1.2 )
+
         if CommandLine.arguments.contains( "--open-fan-control" )
         {
             DispatchQueue.main.asyncAfter( deadline: .now() + .milliseconds( 800 ) )
@@ -168,6 +172,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         self.exiting = true
         self.updateCheckTimer?.invalidate()
         self.updateCheckTimer = nil
+        AppProcessService.shared.stopBackgroundWarming()
+        DevPortStopService.shared.stopBackgroundWarming()
         FanControlService.restoreBeforeTerminationIfNeeded()
     }
 

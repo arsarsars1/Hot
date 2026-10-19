@@ -35,6 +35,13 @@ struct DevPortListener: Equatable
     let startedAt: UInt64
 }
 
+/// Cached Dev-port listener snapshot for stale-while-revalidate UI.
+struct DevPortListenerSnapshot: Equatable
+{
+    let listeners: [ DevPortListener ]
+    let fetchedAt: Date
+}
+
 enum DevPortStopResult: Equatable
 {
     case nothingToStop
@@ -47,6 +54,20 @@ enum DevPortStopResult: Equatable
 final class DevPortStopService
 {
     static let shared = DevPortStopService()
+
+    /// Open-sidebar TTL for listener cache (~5s).
+    static let openMaxAge: TimeInterval = 5.0
+    /// Closed-sidebar warm interval (~15s).
+    static let closedWarmInterval: TimeInterval = 15.0
+    /// Back-compat alias for open-path max age.
+    static let defaultMaxAge: TimeInterval = DevPortStopService.openMaxAge
+
+    private let lock = NSLock()
+    private var _cachedSnapshot: DevPortListenerSnapshot?
+    private var refreshCompletions: [ ( DevPortListenerSnapshot ) -> Void ] = []
+    private var refreshInFlight = false
+    private var warmTimer: DispatchSourceTimer?
+    private var warmingStarted = false
 
     private struct KillTarget: Equatable
     {
@@ -62,28 +83,183 @@ final class DevPortStopService
         case stale
     }
 
-    /// Fresh `lsof` snapshot filtered to `ports` (default: DevGuard set).
-    func discoverListeners( in ports: Set<Int> = DevPortSupport.devGuardPorts ) -> [ DevPortListener ]
+    private enum LsofCapture
     {
-        let ( listening, names ) = Self.listeningSnapshot()
-        return DevPortSupport.pids( listening, matching: ports ).compactMap
+        case success( String )
+        case failed
+    }
+
+    /// Thread-safe last good listener snapshot.
+    var cachedSnapshot: DevPortListenerSnapshot?
+    {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        return self._cachedSnapshot
+    }
+
+    /// Start deferred + periodic closed-cadence warming (idempotent). Call once after launch.
+    func startBackgroundWarming( deferred: TimeInterval = 1.0 )
+    {
+        self.lock.lock()
+        let already = self.warmingStarted
+        if already == false
         {
-            pid in
-            guard !DevPortSupport.isProtected( pid: pid, name: names[ pid ] ?? "" ),
-                  let startedAt = Self.currentStartTime( pid: pid )
+            self.warmingStarted = true
+        }
+        self.lock.unlock()
+
+        guard already == false
+        else
+        {
+            return
+        }
+
+        DispatchQueue.global( qos: .utility ).asyncAfter( deadline: .now() + deferred )
+        {
+            [ weak self ] in
+            self?.refreshIfNeeded( maxAge: 0, completion: { _ in } )
+            self?.installWarmTimer()
+        }
+    }
+
+    /// Stop closed-cadence warming (e.g. on terminate).
+    func stopBackgroundWarming()
+    {
+        self.lock.lock()
+        self.warmingStarted = false
+        let timer = self.warmTimer
+        self.warmTimer = nil
+        self.lock.unlock()
+        timer?.cancel()
+    }
+
+    /// Single-flight `lsof` refresh. Completions run off the main thread.
+    /// On `lsof` timeout/failure, keeps the last good cache (fail soft).
+    func refreshIfNeeded( maxAge: TimeInterval = DevPortStopService.openMaxAge,
+                          ports: Set<Int> = DevPortSupport.devGuardPorts,
+                          completion: @escaping ( DevPortListenerSnapshot ) -> Void )
+    {
+        self.lock.lock()
+        if let snap = self._cachedSnapshot,
+           maxAge > 0,
+           Date().timeIntervalSince( snap.fetchedAt ) <= maxAge
+        {
+            self.lock.unlock()
+            DispatchQueue.global( qos: .utility ).async
+            {
+                completion( snap )
+            }
+            return
+        }
+
+        self.refreshCompletions.append( completion )
+
+        if self.refreshInFlight
+        {
+            self.lock.unlock()
+            return
+        }
+
+        self.refreshInFlight = true
+        self.lock.unlock()
+
+        DispatchQueue.global( qos: .utility ).async
+        {
+            [ weak self ] in
+            guard let self = self
             else
             {
-                return nil
+                return
             }
 
-            let matched = DevPortSupport.ports( listening[ pid ] ?? [], in: ports )
+            let snap = self.captureListeners( in: ports )
 
-            return DevPortListener(
-                pid: pid,
-                processName: names[ pid ] ?? "pid \( pid )",
-                ports: matched,
-                startedAt: startedAt
-            )
+            self.lock.lock()
+            if let snap = snap
+            {
+                self._cachedSnapshot = snap
+            }
+            let deliver = snap ?? self._cachedSnapshot
+                ?? DevPortListenerSnapshot( listeners: [], fetchedAt: Date() )
+            let waiters = self.refreshCompletions
+            self.refreshCompletions = []
+            self.refreshInFlight = false
+            self.lock.unlock()
+
+            for waiter in waiters
+            {
+                waiter( deliver )
+            }
+        }
+    }
+
+    /// Fresh `lsof` snapshot filtered to `ports` (default: DevGuard set).
+    /// Returns `[]` if `lsof` fails or times out (does not mutate cache).
+    func discoverListeners( in ports: Set<Int> = DevPortSupport.devGuardPorts ) -> [ DevPortListener ]
+    {
+        self.captureListeners( in: ports )?.listeners ?? []
+    }
+
+    // MARK: - Warm timer
+
+    private func installWarmTimer()
+    {
+        self.lock.lock()
+        guard self.warmingStarted, self.warmTimer == nil
+        else
+        {
+            self.lock.unlock()
+            return
+        }
+
+        let timer = DispatchSource.makeTimerSource( queue: DispatchQueue.global( qos: .utility ) )
+        timer.schedule(
+            deadline: .now() + Self.closedWarmInterval,
+            repeating: Self.closedWarmInterval,
+            leeway: .seconds( 2 )
+        )
+        timer.setEventHandler
+        {
+            [ weak self ] in
+            self?.refreshIfNeeded( maxAge: Self.closedWarmInterval * 0.75, completion: { _ in } )
+        }
+        self.warmTimer = timer
+        self.lock.unlock()
+        timer.resume()
+    }
+
+    /// Parses a successful `lsof` capture into listeners; `nil` on fail/timeout.
+    private func captureListeners( in ports: Set<Int> ) -> DevPortListenerSnapshot?
+    {
+        switch Self.runLsof()
+        {
+            case .failed:
+                return nil
+
+            case .success( let output ):
+                let listening = DevPortSupport.listeningPortsByPID( fromLsof: output )
+                let names = DevPortSupport.processNamesByPID( fromLsof: output )
+                let listeners = DevPortSupport.pids( listening, matching: ports ).compactMap
+                {
+                    pid -> DevPortListener? in
+                    guard !DevPortSupport.isProtected( pid: pid, name: names[ pid ] ?? "" ),
+                          let startedAt = Self.currentStartTime( pid: pid )
+                    else
+                    {
+                        return nil
+                    }
+
+                    let matched = DevPortSupport.ports( listening[ pid ] ?? [], in: ports )
+
+                    return DevPortListener(
+                        pid: pid,
+                        processName: names[ pid ] ?? "pid \( pid )",
+                        ports: matched,
+                        startedAt: startedAt
+                    )
+                }
+
+                return DevPortListenerSnapshot( listeners: listeners, fetchedAt: Date() )
         }
     }
 
@@ -144,16 +320,8 @@ final class DevPortStopService
 
     // MARK: - Snapshot / identity
 
-    private static func listeningSnapshot() -> ( [ pid_t: [ Int ] ], [ pid_t: String ] )
-    {
-        let output = runLsof()
-        return (
-            DevPortSupport.listeningPortsByPID( fromLsof: output ),
-            DevPortSupport.processNamesByPID( fromLsof: output )
-        )
-    }
-
-    private static func runLsof() -> String
+    /// Runs `lsof` with a hard timeout; `.failed` on launch error or slow kill.
+    private static func runLsof() -> LsofCapture
     {
         let process            = Process()
         process.executableURL  = URL( fileURLWithPath: "/usr/sbin/lsof" )
@@ -168,7 +336,7 @@ final class DevPortStopService
         }
         catch
         {
-            return ""
+            return .failed
         }
 
         let deadline = Date().addingTimeInterval( 5 )
@@ -181,12 +349,12 @@ final class DevPortStopService
         if process.isRunning
         {
             process.terminate()
-            return ""
+            return .failed
         }
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
 
-        return String( data: data, encoding: .utf8 ) ?? ""
+        return .success( String( data: data, encoding: .utf8 ) ?? "" )
     }
 
     private static func currentStartTime( pid: pid_t ) -> UInt64?
