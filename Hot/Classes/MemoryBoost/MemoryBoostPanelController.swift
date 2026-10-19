@@ -25,12 +25,16 @@
 import Cocoa
 
 /// Compact status-menu sidebar: processes by RAM + Dev-ports Stop All.
-final class MemoryBoostPanelController: NSViewController
+final class MemoryBoostPanelController: NSViewController, NSTableViewDataSource, NSTableViewDelegate
 {
     private static let panelWidth: CGFloat  = 340
     private static let panelHeight: CGFloat = 420
-    /// Main-thread render budget: scroll shows top-N by RAM; pill shows total scanned.
-    private static let visibleProcessLimit = 48
+    /// Initial paint budget; Show more steps up (virtualized table can hold the full list).
+    private static let initialVisibleLimit = 48
+    private static let visibleStep         = 48
+    private static let appRowHeight: CGFloat = 44
+    private static let appsColumnID = NSUserInterfaceItemIdentifier( "hot.memoryBoost.app" )
+    private static let appsCellID   = NSUserInterfaceItemIdentifier( "hot.memoryBoost.appCell" )
 
     private let appService  = AppProcessService.shared
     private let portService = DevPortStopService.shared
@@ -38,28 +42,33 @@ final class MemoryBoostPanelController: NSViewController
     /// Called when the user taps Hide — collapses the Memory Boost sidebar.
     var onRequestCollapse: ( () -> Void )?
 
-    private var appsStack:       NSStackView!
-    private var listenersStack:  NSStackView!
-    private var appsCountPill:   NSTextField!
-    private var portsCountPill:  NSTextField!
-    private var statusLabel:     NSTextField!
-    private var statusSpinner:   NSProgressIndicator!
-    private var stopPortsButton: NSButton!
-    private var appsScroll:      NSScrollView!
-    private var portsScroll:     NSScrollView!
-    private var contentStack:    NSStackView!
+    private var appsTable:            NSTableView!
+    private var appsPlaceholderStack: NSStackView!
+    private var listenersStack:       NSStackView!
+    private var appsCountPill:        NSTextField!
+    private var portsCountPill:       NSTextField!
+    private var appsShowingLabel:     NSTextField!
+    private var showMoreButton:       NSButton!
+    private var appsFooter:           NSStackView!
+    private var statusLabel:          NSTextField!
+    private var statusSpinner:        NSProgressIndicator!
+    private var stopPortsButton:      NSButton!
+    private var appsScroll:           NSScrollView!
+    private var portsScroll:          NSScrollView!
+    private var contentStack:         NSStackView!
     private var contentHeightConstraint: NSLayoutConstraint?
     private var listsCollapsed   = false
     private var refreshTimer:    Timer?
     private var apps:            [ AppProcessInfo ] = []
+    /// Rows currently exposed in the table (prefix of `apps` up to `visibleProcessLimit`).
+    private var visibleApps:     [ AppProcessInfo ] = []
+    private var visibleProcessLimit = MemoryBoostPanelController.initialVisibleLimit
     private var listeners:       [ DevPortListener ] = []
     private var isPresented      = false
     private var isBusy           = false
     /// True while an open-path / cold list refresh is in flight (skeletons + status pill).
     private var refreshInFlight  = false
     private var collapseListsButton: NSButton!
-    /// PID → live row for diff updates (no full stack teardown each tick).
-    private var appRowByPID:     [ pid_t: AppProcessRowView ] = [:]
     /// Icons keyed by bundle ID or `pid:<n>`; resolved once, not every refresh.
     private var iconByCacheKey:  [ String: NSImage ] = [:]
     /// Keys whose cached image is an SF Symbol placeholder (tint on image view).
@@ -115,6 +124,8 @@ final class MemoryBoostPanelController: NSViewController
         self.isPresented = false
         self.refreshTimer?.invalidate()
         self.refreshTimer = nil
+        // Next open starts light again (top-N); Show more re-expands as needed.
+        self.visibleProcessLimit = Self.initialVisibleLimit
         // Closed-cadence warmer on AppProcessService keeps running.
     }
 
@@ -216,15 +227,39 @@ final class MemoryBoostPanelController: NSViewController
         self.appsCountPill = appsPill
         self.contentStack.addArrangedSubview( appsHeader )
 
-        self.appsStack = NSStackView()
-        self.appsStack.orientation = .vertical
-        self.appsStack.alignment = .width
-        self.appsStack.spacing = 4
-        self.appsStack.translatesAutoresizingMaskIntoConstraints = false
+        let appsHost = self.makeAppsListHost( height: 200 )
+        self.contentStack.addArrangedSubview( appsHost )
+        appsHost.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
-        self.appsScroll = self.makeScrollHost( documentStack: self.appsStack, height: 200 )
-        self.contentStack.addArrangedSubview( self.appsScroll )
-        self.appsScroll.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
+        self.appsFooter = NSStackView()
+        self.appsFooter.orientation = .horizontal
+        self.appsFooter.alignment = .centerY
+        self.appsFooter.spacing = 8
+        self.appsFooter.translatesAutoresizingMaskIntoConstraints = false
+
+        self.appsShowingLabel = NSTextField( labelWithString: "" )
+        self.appsShowingLabel.font = NSFont.systemFont( ofSize: 9, weight: .medium )
+        self.appsShowingLabel.textColor = .tertiaryLabelColor
+        self.appsFooter.addArrangedSubview( self.appsShowingLabel )
+
+        let footerSpacer = NSView()
+        footerSpacer.setContentHuggingPriority( .defaultLow, for: .horizontal )
+        self.appsFooter.addArrangedSubview( footerSpacer )
+
+        self.showMoreButton = NSButton(
+            title: "Show more",
+            target: self,
+            action: #selector( self.showMoreApps( _: ) )
+        )
+        self.showMoreButton.bezelStyle = .recessed
+        self.showMoreButton.controlSize = .small
+        self.showMoreButton.font = NSFont.systemFont( ofSize: 10, weight: .medium )
+        self.showMoreButton.toolTip = "Reveal more processes by RAM (list is virtualized)"
+        self.showMoreButton.isHidden = true
+        self.appsFooter.addArrangedSubview( self.showMoreButton )
+
+        self.contentStack.addArrangedSubview( self.appsFooter )
+        self.appsFooter.widthAnchor.constraint( equalTo: self.contentStack.widthAnchor ).isActive = true
 
         let quitHint = NSTextField( labelWithString: "⌥-click Quit to Force Quit · helpers use signal" )
         quitHint.font = NSFont.systemFont( ofSize: 9, weight: .medium )
@@ -434,6 +469,74 @@ final class MemoryBoostPanelController: NSViewController
         return scroll
     }
 
+    /// Virtualized apps list: view-based `NSTableView` + overlay for skeletons / empty.
+    private func makeAppsListHost( height: CGFloat ) -> NSView
+    {
+        let host = NSView()
+        host.translatesAutoresizingMaskIntoConstraints = false
+        host.wantsLayer = true
+        host.layer?.cornerRadius = 8
+        host.layer?.backgroundColor = NSColor.labelColor.withAlphaComponent( 0.045 ).cgColor
+        host.heightAnchor.constraint( equalToConstant: height ).isActive = true
+
+        let scroll = NSScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.hasVerticalScroller = true
+        scroll.hasHorizontalScroller = false
+        scroll.autohidesScrollers = true
+        scroll.borderType = .noBorder
+        scroll.drawsBackground = false
+        scroll.focusRingType = .none
+
+        let table = NSTableView()
+        table.headerView = nil
+        table.allowsEmptySelection = true
+        table.allowsMultipleSelection = false
+        table.selectionHighlightStyle = .none
+        table.backgroundColor = .clear
+        table.usesAlternatingRowBackgroundColors = false
+        table.rowHeight = Self.appRowHeight
+        table.intercellSpacing = NSSize( width: 0, height: 4 )
+        table.focusRingType = .none
+        table.dataSource = self
+        table.delegate = self
+
+        let column = NSTableColumn( identifier: Self.appsColumnID )
+        column.resizingMask = .autoresizingMask
+        column.minWidth = 200
+        table.addTableColumn( column )
+        table.sizeLastColumnToFit()
+
+        scroll.documentView = table
+        self.appsTable = table
+        self.appsScroll = scroll
+
+        self.appsPlaceholderStack = NSStackView()
+        self.appsPlaceholderStack.orientation = .vertical
+        self.appsPlaceholderStack.alignment = .width
+        self.appsPlaceholderStack.spacing = 4
+        self.appsPlaceholderStack.edgeInsets = NSEdgeInsets( top: 6, left: 6, bottom: 6, right: 6 )
+        self.appsPlaceholderStack.translatesAutoresizingMaskIntoConstraints = false
+        self.appsPlaceholderStack.isHidden = true
+
+        host.addSubview( scroll )
+        host.addSubview( self.appsPlaceholderStack )
+        NSLayoutConstraint.activate(
+            [
+                scroll.leadingAnchor.constraint( equalTo: host.leadingAnchor ),
+                scroll.trailingAnchor.constraint( equalTo: host.trailingAnchor ),
+                scroll.topAnchor.constraint( equalTo: host.topAnchor ),
+                scroll.bottomAnchor.constraint( equalTo: host.bottomAnchor ),
+                self.appsPlaceholderStack.leadingAnchor.constraint( equalTo: host.leadingAnchor ),
+                self.appsPlaceholderStack.trailingAnchor.constraint( equalTo: host.trailingAnchor ),
+                self.appsPlaceholderStack.topAnchor.constraint( equalTo: host.topAnchor ),
+                self.appsPlaceholderStack.bottomAnchor.constraint( lessThanOrEqualTo: host.bottomAnchor ),
+            ]
+        )
+
+        return host
+    }
+
     private func makeStatusPill() -> NSView
     {
         let row = NSStackView()
@@ -636,106 +739,105 @@ final class MemoryBoostPanelController: NSViewController
         }
     }
 
-    private func clearAppRowPool()
-    {
-        for ( _, row ) in self.appRowByPID
-        {
-            self.appsStack.removeArrangedSubview( row )
-            row.removeFromSuperview()
-        }
-        self.appRowByPID.removeAll( keepingCapacity: true )
-    }
-
-    /// Diff-apply top-N rows by PID; pill shows total scanned count.
+    /// Diff-apply visible prefix by PID into the virtualized table; pill shows total scanned.
     private func applyAppRows()
     {
         self.appsCountPill.stringValue = "\( self.apps.count )"
 
         if self.apps.isEmpty
         {
-            self.clearAppRowPool()
-            self.clearStack( self.appsStack )
-            self.showingAppSkeletons = false
-
-            if self.refreshInFlight
-            {
-                self.appsCountPill.stringValue = "…"
-                self.showingAppSkeletons = true
-                for _ in 0 ..< 4
-                {
-                    self.appsStack.addArrangedSubview( self.makeSkeletonAppRow() )
-                }
-            }
-            else
-            {
-                let empty = NSTextField( labelWithString: "No processes to list" )
-                empty.font = NSFont.systemFont( ofSize: 11 )
-                empty.textColor = .tertiaryLabelColor
-                self.appsStack.addArrangedSubview( empty )
-            }
-            self.layoutDocument( self.appsStack, in: self.appsScroll )
+            self.visibleApps = []
+            self.appsTable.reloadData()
+            self.showAppsPlaceholder()
+            self.updateShowMoreFooter()
             return
         }
 
-        // Drop skeletons / empty placeholder before first real rows land.
-        if self.showingAppSkeletons || ( self.appRowByPID.isEmpty && self.appsStack.arrangedSubviews.isEmpty == false )
+        self.hideAppsPlaceholder()
+
+        // Keep an expanded limit if the user already asked for more, but never above the scan.
+        if self.visibleProcessLimit > self.apps.count
         {
-            self.clearStack( self.appsStack )
-            self.showingAppSkeletons = false
+            self.visibleProcessLimit = max( Self.initialVisibleLimit, self.apps.count )
         }
 
-        let visible = Array( self.apps.prefix( Self.visibleProcessLimit ) )
-        let newPIDs = Set( visible.map( \.pid ) )
+        let next = Array( self.apps.prefix( self.visibleProcessLimit ) )
+        let sameIdentity = next.map( \.pid ) == self.visibleApps.map( \.pid )
 
-        for pid in self.appRowByPID.keys.filter( { newPIDs.contains( $0 ) == false } )
+        if sameIdentity, next.isEmpty == false
         {
-            if let row = self.appRowByPID.removeValue( forKey: pid )
-            {
-                self.appsStack.removeArrangedSubview( row )
-                row.removeFromSuperview()
-            }
+            self.visibleApps = next
+            let rows = IndexSet( integersIn: 0 ..< self.visibleApps.count )
+            self.appsTable.reloadData( forRowIndexes: rows, columnIndexes: IndexSet( integer: 0 ) )
+        }
+        else
+        {
+            self.visibleApps = next
+            self.appsTable.reloadData()
         }
 
-        for ( index, app ) in visible.enumerated()
-        {
-            let rank = index + 1
-            if let row = self.appRowByPID[ app.pid ]
-            {
-                row.update( app: app, rank: rank )
-            }
-            else
-            {
-                let row = self.makeAppProcessRow( app: app, rank: rank )
-                self.appRowByPID[ app.pid ] = row
-                let insertAt = min( index, self.appsStack.arrangedSubviews.count )
-                self.appsStack.insertArrangedSubview( row, at: insertAt )
-            }
-        }
-
-        self.syncAppRowOrder( visible )
-        self.layoutDocument( self.appsStack, in: self.appsScroll )
+        self.updateShowMoreFooter()
     }
 
-    private func syncAppRowOrder( _ visible: [ AppProcessInfo ] )
+    private func showAppsPlaceholder()
     {
-        for ( index, app ) in visible.enumerated()
+        self.clearStack( self.appsPlaceholderStack )
+        self.showingAppSkeletons = false
+        self.appsScroll.isHidden = true
+        self.appsPlaceholderStack.isHidden = false
+
+        if self.refreshInFlight
         {
-            guard let row = self.appRowByPID[ app.pid ]
-            else
+            self.appsCountPill.stringValue = "…"
+            self.showingAppSkeletons = true
+            for _ in 0 ..< 4
             {
-                continue
+                self.appsPlaceholderStack.addArrangedSubview( self.makeSkeletonAppRow() )
             }
+        }
+        else
+        {
+            let empty = NSTextField( labelWithString: "No processes to list" )
+            empty.font = NSFont.systemFont( ofSize: 11 )
+            empty.textColor = .tertiaryLabelColor
+            self.appsPlaceholderStack.addArrangedSubview( empty )
+        }
+    }
 
-            let arranged = self.appsStack.arrangedSubviews
-            if index < arranged.count, arranged[ index ] === row
-            {
-                continue
-            }
+    private func hideAppsPlaceholder()
+    {
+        if self.showingAppSkeletons || self.appsPlaceholderStack.isHidden == false
+        {
+            self.clearStack( self.appsPlaceholderStack )
+            self.showingAppSkeletons = false
+            self.appsPlaceholderStack.isHidden = true
+        }
+        self.appsScroll.isHidden = false
+    }
 
-            self.appsStack.removeArrangedSubview( row )
-            row.removeFromSuperview()
-            let insertAt = min( index, self.appsStack.arrangedSubviews.count )
-            self.appsStack.insertArrangedSubview( row, at: insertAt )
+    private func updateShowMoreFooter()
+    {
+        let showing = self.visibleApps.count
+        let total = self.apps.count
+
+        if total == 0
+        {
+            self.appsShowingLabel.stringValue = ""
+            self.appsFooter.isHidden = true
+            return
+        }
+
+        self.appsFooter.isHidden = false
+        self.appsShowingLabel.stringValue = "Showing \( showing ) of \( total )"
+
+        let canShowMore = showing < total
+        self.showMoreButton.isHidden = canShowMore == false
+        if canShowMore
+        {
+            let nextCount = min( showing + Self.visibleStep, total )
+            self.showMoreButton.title = nextCount >= total
+                ? "Show all (\( total ))"
+                : "Show more"
         }
     }
 
@@ -788,10 +890,8 @@ final class MemoryBoostPanelController: NSViewController
         return row
     }
 
-    private func makeAppProcessRow( app: AppProcessInfo, rank: Int ) -> AppProcessRowView
+    private func bindAppRow( _ row: AppProcessRowView, app: AppProcessInfo, rank: Int )
     {
-        let row = AppProcessRowView()
-        row.configureChrome( emphasized: rank <= 3 )
         row.quitButton.target = self
         row.quitButton.action = #selector( self.quitApp( _: ) )
         let resolved = self.cachedIcon( for: app )
@@ -800,8 +900,55 @@ final class MemoryBoostPanelController: NSViewController
         {
             row.iconView.contentTintColor = .secondaryLabelColor
         }
+        else
+        {
+            row.iconView.contentTintColor = nil
+        }
         row.update( app: app, rank: rank )
-        return row
+    }
+
+    // MARK: - NSTableView
+
+    func numberOfRows( in tableView: NSTableView ) -> Int
+    {
+        tableView === self.appsTable ? self.visibleApps.count : 0
+    }
+
+    func tableView( _ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int ) -> NSView?
+    {
+        guard tableView === self.appsTable, row >= 0, row < self.visibleApps.count
+        else
+        {
+            return nil
+        }
+
+        let app = self.visibleApps[ row ]
+        let cell: AppProcessRowView
+        if let reused = tableView.makeView( withIdentifier: Self.appsCellID, owner: self ) as? AppProcessRowView
+        {
+            cell = reused
+        }
+        else
+        {
+            cell = AppProcessRowView()
+            cell.identifier = Self.appsCellID
+            // Table view owns the cell frame; keep autoresizing for column width.
+            cell.translatesAutoresizingMaskIntoConstraints = true
+            cell.autoresizingMask = [ .width ]
+        }
+
+        self.bindAppRow( cell, app: app, rank: row + 1 )
+        return cell
+    }
+
+    func tableView( _ tableView: NSTableView, heightOfRow row: Int ) -> CGFloat
+    {
+        Self.appRowHeight
+    }
+
+    func tableView( _ tableView: NSTableView, shouldSelectRow row: Int ) -> Bool
+    {
+        false
     }
 
     /// Resolve icon once per bundle / PID; SF Symbol placeholders when no app icon.
@@ -907,6 +1054,28 @@ final class MemoryBoostPanelController: NSViewController
     }
 
     // MARK: - Actions
+
+    @objc
+    private func showMoreApps( _ sender: Any? )
+    {
+        guard self.apps.isEmpty == false
+        else
+        {
+            return
+        }
+
+        let next = min( self.visibleProcessLimit + Self.visibleStep, self.apps.count )
+        // Final step jumps to full scan count (virtualized — no stack hard-cap).
+        if next >= self.apps.count || self.visibleProcessLimit + Self.visibleStep >= self.apps.count
+        {
+            self.visibleProcessLimit = self.apps.count
+        }
+        else
+        {
+            self.visibleProcessLimit = next
+        }
+        self.applyAppRows()
+    }
 
     @objc
     private func quitApp( _ sender: Any? )

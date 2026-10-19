@@ -157,8 +157,20 @@ NS_ASSUME_NONNULL_END
       return YES;
     }
 
-    io_service_t smc = IOServiceGetMatchingService(
-        kIOMasterPortDefault, IOServiceMatching("AppleSMC"));
+    // Prefer kIOMainPortDefault (macOS 12+). Pre-12 fallback still needs
+    // kIOMasterPortDefault; silence deprecation only on that one line so
+    // -Werror Release builds succeed on current SDKs.
+    mach_port_t port;
+    if (@available(macOS 12.0, *)) {
+      port = kIOMainPortDefault;
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+      port = kIOMasterPortDefault;
+#pragma clang diagnostic pop
+    }
+    io_service_t smc =
+        IOServiceGetMatchingService(port, IOServiceMatching("AppleSMC"));
 
     if (smc == IO_OBJECT_NULL) {
       if (error) {

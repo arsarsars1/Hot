@@ -29,7 +29,7 @@ A graph view for all sensors may also be displayed on Apple Silicon.
 
 #### Memory Boost
 
-From the status menu, **Memory Boost…** opens a sidebar (same shell as Fan Control — opening one collapses the other) that ranks processes by resident memory (apps, helpers, widgets, agents — high → low) and shows the heaviest ones for a responsive UI. **Quit** terminates an app or signals a helper; Option-click Force Quits. **▾ Lists** hides the lists without shrinking the panel; **Hide** collapses the sidebar. The panel also includes **Stop all listeners** for leftover TCP listeners on common DevGuard-style ports (`3000–3002`, `5173–5176`, `5199`). System-protected processes and Hot itself are never listed as killable.
+From the status menu, **Memory Boost…** opens a sidebar (same shell as Fan Control — opening one collapses the other) that ranks processes by resident memory (apps, helpers, widgets, agents — high → low) and shows the heaviest first in a virtualized list; **Show more** reveals additional rows up to the full scan. **Quit** terminates an app or signals a helper; Option-click Force Quits. **▾ Lists** hides the lists without shrinking the panel; **Hide** collapses the sidebar. The panel also includes **Stop all listeners** for leftover TCP listeners on common DevGuard-style ports (`3000–3002`, `5173–5176`, `5199`). System-protected processes and Hot itself are never listed as killable.
 
 License
 -------
